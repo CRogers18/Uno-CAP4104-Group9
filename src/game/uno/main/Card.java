@@ -9,12 +9,13 @@ public class Card {
 	
 	public Card(char c, int v, boolean spec, int specV)
 	{
-		// No-argument constructor
+		// Initialization of card parameters
 		color = c;
 		value = v;
 		special = spec;
 		specialValue = specV;
 		
-		System.out.println("Card made with color: " + c + ", Value: " + v + ", Special: " + spec + ", Special Value: " + specV);
+		if (Main.debug == true)
+			System.out.println("Card made with color: " + c + ", Value: " + v + ", Special: " + spec + ", Special Value: " + specV);
 	}
 }

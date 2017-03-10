@@ -15,22 +15,6 @@ public class CardOps {
 		// No-argument constructor
 	}
 	
-	// Make a sorted deck of cards :)
-	public static Card[] initDeck()
-	{
-		Card[] deck = new Card[108];
-		
-		for (int i = 0; i < 5; i++)
-		{
-			for (int j = 1; j < 10; j++)
-			{
-				// IDK
-			}
-		}
-		
-		return deck;
-	}
-	
 	// SHuffling cards returns a shuffled stack, may need a new method for different kind of shuffle
 	public static Stack<Card> firstShuffle()
 	{

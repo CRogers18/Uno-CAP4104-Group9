@@ -14,9 +14,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-@SuppressWarnings("unused")
 public class Main implements Runnable {
 	
+	public static boolean debug = false;	// Set to true to print more information to console during runtime
 	public boolean isRunning = true;
 	public long window;
 	
@@ -24,6 +24,9 @@ public class Main implements Runnable {
 	private GLFWKeyCallback keyCallback;
 	
 	private Card topCard;
+		 
+	/* NOTE: Code has been compiled using LWJGL Version 3.1.1 and run with JRE 1.8.0_121
+	         it has not been tested for compatibility with alternate versions */
 	
 	public static void main(String[] args)
 	{
@@ -64,8 +67,17 @@ public class Main implements Runnable {
 		glfwMakeContextCurrent(window);
 		glfwShowWindow(window);
 		
+		/*   *** OPENGL INITIALIZATION ***   */
+		GL.createCapabilities();
+		
+		// RGB and Alpha values to be displayed when color buffer is cleared
+		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+		glEnable(GL_DEPTH_TEST);
+		System.out.println("[INFO] OpenGL Version/Graphics Driver: " + glGetString(GL_VERSION) + "\n[INFO] OpenGL has been initialized.");
+		
 		/*   *** CARD STACK INITIALIZATION ***   */
 		Stack<Card> mainDeck = CardOps.firstShuffle();
+		System.out.println("[INFO] Main card stack has been created");
 		Stack<Card> discardDeck = new Stack<Card>();
 		
 	/*	for (int i = 1; i < 109; i++)
@@ -90,12 +102,14 @@ public class Main implements Runnable {
 	{
 		// Swap front and back window buffers 
 		glfwSwapBuffers(window);
+		
+		// Clear color buffers on render call
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	@Override
 	public void run() 
 	{
-		// Where thread.start() goes
 		init();
 		
 		// Main game loop for processing events and rendering changes
@@ -111,8 +125,9 @@ public class Main implements Runnable {
 		
 	}
 	
-	public void GLFWKeyCallback(long window, int key, int scancode, int action, int mods) {
-		
+	public void GLFWKeyCallback(long window, int key, int scancode, int action, int mods) 
+	{
+		// Some experimentation with input handling, no functionality yet
 	}
 
 }
