@@ -16,7 +16,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main implements Runnable {
 	
-	public static boolean debug = false;	// Set to true to print more information to console during runtime
+	public static boolean debug = true;	// Set to true to print more information to console during runtime
 	public boolean isRunning = true;
 	public long window;
 	
@@ -76,7 +76,7 @@ public class Main implements Runnable {
 		System.out.println("[INFO] OpenGL Version/Graphics Driver: " + glGetString(GL_VERSION) + "\n[INFO] OpenGL has been initialized.");
 		
 		/*   *** CARD STACK INITIALIZATION ***   */
-		Stack<Card> mainDeck = CardOps.firstShuffle();
+		Card[] mainDeck = CardOps.makeNewDeck();
 		System.out.println("[INFO] Main card stack has been created");
 		Stack<Card> discardDeck = new Stack<Card>();
 		
