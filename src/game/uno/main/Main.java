@@ -16,36 +16,31 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main implements Runnable {
 	
-	public static boolean debug = true;	// Set to true to print more information to console during runtime
-	public boolean isRunning = true;
+	/* NOTE: Code has been compiled using LWJGL Version 3.1.1 and run with JRE 1.8.0_121
+    		 it has not been tested for compatibility with alternate versions */
+	
+	public static boolean debug = true; // Set to true to print more information to console during runtime, could be moved to a constants class
+	private boolean isRunning = true;	// Main game loop variable
+	
 	public long window;
 	
-	private Thread thread;
+	private static int playerCount = 3;	// Both variables will be moved to a different section when needed, hard-coded for now
+	private String playerName = "Pipsqueak";
+		
 	private GLFWKeyCallback keyCallback;
-	
-	private Card topCard;
-		 
-	/* NOTE: Code has been compiled using LWJGL Version 3.1.1 and run with JRE 1.8.0_121
-	         it has not been tested for compatibility with alternate versions */
-	
+		
 	public static void main(String[] args)
 	{
 		System.out.println("[INFO] Uno: CAP 4104 Edition was built using LWJGL Version " + Version.getVersion());
 		Main game = new Main();
-		game.start();
-	}
-	
-	public void start()
-	{
-		// Create and run a new game thread
-		thread = new Thread(this, "Uno");
-		thread.start();
+		game.init();
+		game.run();
 	}
 	
 	public void init()
-	{
+	{	
 		/*   *** WINDOW INITIALIZATION ***   */
-		
+				
 		// Try to initialize GLFW window management
 		if(!glfwInit())
 			System.err.println("[ERROR] GLFW failed to initialize!");
@@ -62,7 +57,7 @@ public class Main implements Runnable {
 		
 		glfwSetKeyCallback(window, keyCallback);
 		
-		// Set where the window appears and readies window to receive OpenGL method calls
+		// Set where the window appears and readies window to receive OpenGL calls
 		glfwSetWindowPos(window, 500, 200);
 		glfwMakeContextCurrent(window);
 		glfwShowWindow(window);
@@ -70,26 +65,32 @@ public class Main implements Runnable {
 		/*   *** OPENGL INITIALIZATION ***   */
 		GL.createCapabilities();
 		
-		// RGB and Alpha values to be displayed when color buffer is cleared
-		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+		// RGB and Alpha values to be displayed when color buffer is cleared, currently set to red
+		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		System.out.println("[INFO] OpenGL Version/Graphics Driver: " + glGetString(GL_VERSION) + "\n[INFO] OpenGL has been initialized.");
 		
-		/*   *** CARD STACK INITIALIZATION ***   */
-		Card[] mainDeck = CardOps.makeNewDeck();
-		System.out.println("[INFO] Main card stack has been created");
-		Stack<Card> discardDeck = new Stack<Card>();
+		/*   *** Player Initialization ***   */
+		// Code from 85-102 will be moved to a createGame() method when it is made
+		Player[] players = GameManager.initPlayers(playerCount, playerName);
+		System.out.println("[INFO] Players initialized successfully. Game has " + playerCount + " players.\n");
 		
-	/*	for (int i = 1; i < 109; i++)
-		mainDeck.push(new Card('r', 7, false, 0));
-		topCard = (Card) mainDeck.pop();
-		System.out.println("Removed Card with color: " + topCard.color + ", Value: " + topCard.value + ", Special: "
-		+ topCard.special + ", Special Value: " + topCard.specialValue);
-		discardDeck.push(topCard);
-		System.out.println("Added to discard deck, card with color: " + topCard.color + ", Value: " + topCard.value + ", Special: "
-		+ topCard.special + ", Special Value: " + topCard.specialValue);
-		*/
+		/*   *** CARD STACKS INITIALIZATION ***   */
+		Card[] newDeck = CardOps.makeNewDeck();
 		
+		Stack<Card> mainDeck = CardOps.shuffle(newDeck, newDeck.length, playerCount);
+		System.out.println("[INFO] Main card stack has been initialized and shuffled. Stack size = " + mainDeck.size() + "\n");
+		
+		if (debug == true)
+		{
+			System.out.println("*** Post-Shuffle ***");
+			
+			for (int i = 0; i < 108; i++)
+				System.out.println("Card color: " + newDeck[i].color + "  Card value: " + newDeck[i].value);
+		}
+		
+		GameManager.startGame(mainDeck, players, playerCount);
+		System.out.println("Main deck size following shuffle and card to match down = " + mainDeck.size());
 	}
 
 	public void update()
@@ -107,11 +108,8 @@ public class Main implements Runnable {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	@Override
 	public void run() 
-	{
-		init();
-		
+	{		
 		// Main game loop for processing events and rendering changes
 		while(isRunning)
 		{
@@ -120,9 +118,8 @@ public class Main implements Runnable {
 			
 			// If a user exits the window, halt the game loop and close the program
 			if(glfwWindowShouldClose(window))
-					isRunning = false;	
+					isRunning = false;
 		}
-		
 	}
 	
 	public void GLFWKeyCallback(long window, int key, int scancode, int action, int mods) 

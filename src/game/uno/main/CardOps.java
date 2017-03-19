@@ -1,88 +1,135 @@
 package game.uno.main;
 
 import java.util.Stack;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CardOps {
-	
-	static int[] colorCount = {25, 25, 25, 25, 8};
-	static int[] valueCount = {1, 1, 1, 1, 1};
-	static int pick, cardValue = 0, specialValue = 0, cardCount = 0;
-	static Random rnJesus = new Random();
+
+	static int cardValue = 0, specialValue = 0;
 	
 	public CardOps()
 	{
 		// No-argument constructor
 	}
 	
+	// Makes a new deck of cards in sorted order and returns the newly created deck
 	public static Card[] makeNewDeck()
 	{
+		// Make 108 a global variable
 		Card[] newDeck = new Card[108];
 		
 		for (int i = 0; i < 108; i++)
-		{
-			// Makes all the red cards
-			if (i < 26)
+		{			
+			// Makes all of the red cards first, 0->25
+			if (i < 25)
 			{
-				if ((i >= 10 && i < 13) || (i >= 23 && i < 26))
+				if ((i > 9 && i < 13) || (i > 21 && i < 25))	// i < 25 is a redundant check
 				{
 					newDeck[i] = new Card('r', -1, true, specialValue);
 					specialValue++;
 				}
+				
 				else
 				{
-					newDeck[i] = new Card('r', cardValue, false, 0);
+					if (i == 13)
+					{
+						cardValue = 1;
+						newDeck[i] = new Card('r', cardValue, false, -1);
+						cardValue++;
+					}
+					
+					else
+					{
+					newDeck[i] = new Card('r', cardValue, false, -1);
 					cardValue++;
+					}
 				}
 			}
 			
-			// Makes all the yellow cards
-			if (i >= 26 && i < 52)
+			// Makes all the yellow cards, 26->50
+			if (i > 25 && i < 51)
 			{
-				if ((i >= 36 && i < 39) || (i >= 49 && i < 52))
+				if ((i > 35 && i < 39) || (i > 47 && i < 51))
 				{
 					newDeck[i] = new Card('y', -1, true, specialValue);
 					specialValue++;
 				}
+				
 				else
 				{
-					newDeck[i] = new Card('y', cardValue, false, 0);
+					if (i == 39)
+					{
+						cardValue = 1;
+						newDeck[i] = new Card('y', cardValue, false, -1);
+						cardValue++;
+					}
+					
+					else
+					{
+					newDeck[i] = new Card('y', cardValue, false, -1);
 					cardValue++;
+					}
 				}
 			}
 			
-			// Makes all the green cards
-			if (i >= 52 && i < 78)
+			// Makes all the green cards, 52->76
+			if (i > 51 && i < 77)
 			{
-				if ((i >= 62 && i < 65) || (i >= 75 && i < 78))
+				if ((i > 61 && i < 65) || (i > 73 && i < 77))
 				{
 					newDeck[i] = new Card('g', -1, true, specialValue);
 					specialValue++;
 				}
+				
 				else
 				{
-					newDeck[i] = new Card('g', cardValue, false, 0);
+					if (i == 65)
+					{
+						cardValue = 1;
+						newDeck[i] = new Card('g', cardValue, false, -1);
+						cardValue++;
+					}
+					
+					else
+					{
+					newDeck[i] = new Card('g', cardValue, false, -1);
 					cardValue++;
+					}
 				}
 			}
 			
-			// Makes all the blue cards
-			if (i >= 78 && i < 104)
+			// Makes all the blue cards, 78->102
+			if (i > 77 && i < 103)
 			{
-				if ((i >= 88 && i < 91) || (i >= 101 && i < 104))
+				if ((i > 87 && i < 91) || (i > 99 && i < 103))
 				{
-					newDeck[i] = new Card('g', -1, true, specialValue);
+					newDeck[i] = new Card('b', -1, true, specialValue);
 					specialValue++;
 				}
+				
 				else
 				{
-					newDeck[i] = new Card('g', cardValue, false, 0);
+					if (i == 91)
+					{
+						cardValue = 1;
+						newDeck[i] = new Card('b', cardValue, false, -1);
+						cardValue++;
+					}
+					
+					else
+					{
+					newDeck[i] = new Card('b', cardValue, false, -1);
 					cardValue++;
+					}
 				}
 			}
 			
-			// Makes all the black cards
-			if (i >= 104)
+			// Makes a black wild card at the specified index
+			if (i == 25 || i == 51 || i == 77 || i == 103)
+				newDeck[i] = new Card('x', -1, true, 3);
+			
+			// Makes a black +4 wild card
+			if (i > 103)
 				newDeck[i] = new Card('x', -1, true, 4);
 			
 			// Assigns values to the special cards , resets at 3
@@ -97,74 +144,73 @@ public class CardOps {
 		return newDeck;
 	}
 	
-	// SHuffling cards returns a shuffled stack, may need a new method for different kind of shuffle
-	public static Stack<Card> firstShuffle()
+	// General shuffle method
+	public static Stack<Card> shuffle(Card[] deck, int deckSize, int playerCount)
 	{
-		Stack<Card> mainDeck = new Stack<Card>(); 
-		pick = rnJesus.nextInt(5);
+		// Create
+		Stack<Card> mainDeck = new Stack<Card>();
 		
-		while (cardCount != 108)
+		// "Durstenfeld shuffling algorithm"
+		for (int i = 0; i < deckSize; i++)
 		{
-			pick = rnJesus.nextInt(5);
-			
-			// Super stupid way of forcing randomization, plz someone make it better... thx
-			// valueCount can be fixed back to > 10, once special cards are implemented
-			while (colorCount[pick] == 0 || valueCount[pick] > 108 && cardCount < 108)
-				pick = rnJesus.nextInt(5);
-
-			switch (pick)
+			int j = ThreadLocalRandom.current().nextInt(i,deckSize);
+			Card temp = deck[j];
+			deck[j] = deck[i];
+			deck[i] = temp;
+		}
+		
+		/* In the specific case of the first card being a wild-card, swap it out with another card before pushing to
+		   the stack. This code will only execute during the first shuffle where this problem can occur. */
+		if (deckSize == 108)
+		{
+			while (playerCount == 2 && deck[14].color == 'x')
 			{
-				case 0:
-					Card newRed = new Card('r', valueCount[0], false, 0);
-					mainDeck.push(newRed);
-					colorCount[0]--;
-					valueCount[0]++;
-					break;
-					
-				case 1:
-					Card newBlue = new Card('b', valueCount[1], false, 0);
-					mainDeck.push(newBlue);
-					colorCount[1]--;
-					valueCount[1]++;
-					break;
-					
-				case 2:
-					Card newYellow = new Card('y', valueCount[2], false, 0);
-					mainDeck.push(newYellow);
-					colorCount[2]--;
-					valueCount[2]++;
-					break;
-					
-				case 3:
-					Card newGreen = new Card('g', valueCount[3], false, 0);
-					mainDeck.push(newGreen);
-					colorCount[3]--;
-					valueCount[3]++;
-					break;
-					
-				case 4:
-					Card newBlack = new Card('x', valueCount[4], false, 0);
-					mainDeck.push(newBlack);
-					colorCount[4]--;
-					valueCount[4]++;
-					break;
-					
-				default:
-					System.out.println("[ERROR] Pick value of: " + pick + " failed to generate a new card");
-					break;
+				int j = ThreadLocalRandom.current().nextInt(14, deckSize);
+				Card temp = deck[j];
+				deck[j] = deck[14];
+				deck[14] = temp;
 			}
 			
-			cardCount++;
+			while (playerCount == 3 && deck[21].color == 'x')
+			{
+				int j = ThreadLocalRandom.current().nextInt(21, deckSize);
+				Card temp = deck[j];
+				deck[j] = deck[21];
+				deck[21] = temp;
+			}
+
+			while (playerCount == 4 && deck[28].color == 'x')
+			{
+				int j = ThreadLocalRandom.current().nextInt(28, deckSize);
+				Card temp = deck[j];
+				deck[j] = deck[28];
+				deck[28] = temp;
+			}
+			
+			while (playerCount == 5 && deck[35].color == 'x')
+			{
+				int j = ThreadLocalRandom.current().nextInt(35, deckSize);
+				Card temp = deck[j];
+				deck[j] = deck[35];
+				deck[35] = temp;
+			}
 		}
+		
+		// Once everything is good, push to the stack and return the shuffled stack of cards
+		for (int i = 0; i < deckSize; i++)
+			mainDeck.push(deck[i]);
 		
 		return mainDeck;
 	}
 	
-	public static Card[] shuffle(Card[] deck)
+	// Hands the cards out to the players, takes in the players array, player count and main deck of cards
+	public static void distribute(Player[] players, int playerCount, Stack<Card> mainDeck)
 	{
-		// Google "Durstenfeld shuffling algorithm" and put it here with the sorted deck from initDeck()
-		
-		return deck;
+		// Gives each player 7 cards, 1 at a time
+		for (int i = 0; i < 7; i++)
+		{
+			for (int j = 0; j < playerCount; j++)
+				players[j].hand.add(mainDeck.pop());
+		}
 	}
-
 }
