@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CardOps {
 
+	private static enum SpecialValue {SKIP, REVERSE, DRAW_TWO, WILD_CARD, WILD_CARD_DRAW_FOUR};
 	static int cardValue = 0, specialValue = 0;
 	
 	public CardOps()
@@ -161,6 +162,8 @@ public class CardOps {
 		
 		/* In the specific case of the first card being a wild-card, swap it out with another card before pushing to
 		   the stack. This code will only execute during the first shuffle where this problem can occur. */
+		
+		// Needs to be re-checked, instance of the first card being a wild-card has occurred, which means something is wrong
 		if (deckSize == 108)
 		{
 			while (playerCount == 2 && deck[14].color == 'x')
