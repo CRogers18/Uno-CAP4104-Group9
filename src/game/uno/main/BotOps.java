@@ -11,6 +11,7 @@ public class BotOps {
 	
 	public static int playMove(Player[] bots, int currentBot, Stack <Card> discardDeck, Stack <Card> mainDeck)
 	{
+		// Need to not get into the habit of putting the thread to sleep to make a delay...
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {

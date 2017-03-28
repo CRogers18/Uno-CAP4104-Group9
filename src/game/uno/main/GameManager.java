@@ -2,6 +2,8 @@ package game.uno.main;
 
 import java.util.Stack;
 
+import game.uno.main.Main.state;
+
 public class GameManager {
 	
 	private static String playerName = "Pipsqueak";
@@ -52,6 +54,7 @@ public class GameManager {
 	
 	public static void startGame(int playerCount)
 	{
+		Main.gameState = state.GAME;
 		newDeck = CardOps.makeNewDeck();
 		
 		mainDeck = CardOps.shuffle(newDeck, newDeck.length, playerCount);
