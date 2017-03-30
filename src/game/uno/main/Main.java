@@ -1,225 +1,130 @@
 package game.uno.main;
 
-import java.io.IOException;
-import java.net.URL;
+import org.lwjgl.*;
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.*;
+import org.lwjgl.system.*;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import java.nio.*;
+import java.util.Stack;
 
-public class Main {
+import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryUtil.*;
+
+public class Main implements Runnable {
 	
-	/* NOTE: Code has been compiled and run with JRE 1.8.0_121 it has not been tested for compatibility with alternate versions */
+	/* NOTE: Code has been compiled using LWJGL Version 3.1.1 and run with JRE 1.8.0_121
+    		 it has not been tested for compatibility with alternate versions */
 	
-	public static boolean debug = false; // Set to true to print more information to console during runtime, could be moved to a constants class
-	public static boolean startNewGame = false;
-	public static boolean loadNewGameOptions = false;
-	public static boolean validNewGame = false;
-	public static boolean loadOptions = false;
+	public static boolean debug = true; // Set to true to print more information to console during runtime, could be moved to a constants class
 	private boolean isRunning = true;	// Main game loop variable
-		
-	public enum state {MAIN_MENU, GAME, PLAYER_TURN, BOT_TURN};
-	public static state gameState = state.MAIN_MENU;
 	
-	private static int playerCount;
-	public static int nextPlayer = 0;
+	public long window;
 	
-	private long variableYieldTime, lastTime;
+	private static int playerCount = 3;	// Both variables will be moved to a different section when needed, hard-coded for now
+	private String playerName = "Pipsqueak";
 		
-	private Clip clip;
-	private URL url = this.getClass().getResource("nggyu.wav");
-
+	private GLFWKeyCallback keyCallback;
+		
 	public static void main(String[] args)
 	{
+		System.out.println("[INFO] Uno: CAP 4104 Edition was built using LWJGL Version " + Version.getVersion());
 		Main game = new Main();
 		game.init();
 		game.run();
 	}
 	
-    private void sync(int fps) {
-    	
-        if (fps <= 0) return;
-          
-        long sleepTime = 1000000000 / fps; // nanoseconds to sleep this frame
-        long yieldTime = Math.min(sleepTime, variableYieldTime + sleepTime % (1000*1000));
-        long overSleep = 0; // time the sync goes over by
-          
-        try {
-            while (true) {
-                long t = System.nanoTime() - lastTime;
-                  
-                if (t < sleepTime - yieldTime) {
-                    Thread.sleep(1);
-                } else if (t < sleepTime) {
-                    // burn the last few CPU cycles to ensure accuracy
-                    Thread.yield();
-                } else {
-                    overSleep = t - sleepTime;
-                    break; // exit while loop
-                }
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }finally{
-            lastTime = System.nanoTime() - Math.min(overSleep, sleepTime);
-             
-            // auto tune the time sync should yield
-            if (overSleep > variableYieldTime) {
-                // increase by 200 microseconds (1/5 a ms)
-                variableYieldTime = Math.min(variableYieldTime + 200*1000, sleepTime);
-            }
-            else if (overSleep < variableYieldTime - 200*1000) {
-                // decrease by 2 microseconds
-                variableYieldTime = Math.max(variableYieldTime - 2*1000, 0);
-            }
-        }
-    }
-	
-	private void init()
-	{
+	public void init()
+	{	
+		/*   *** WINDOW INITIALIZATION ***   */
+				
+		// Try to initialize GLFW window management
+		if(!glfwInit())
+			System.err.println("[ERROR] GLFW failed to initialize!");
 		
-		GameGraphics.createMainMenu();
+		// Prevent user modification of window and create the main window
+		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+		window = glfwCreateWindow(1280, 720, "Uno: CAP 4104 Edition", NULL, NULL);
 		
-		// *Palpatine voice* DO IT
-		try {
-			audioPrep();
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-		} catch (UnsupportedAudioFileException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(window == NULL)
+			System.err.println("[ERROR] GLFW window creation failed!");
+		
+		// Gets the connected user monitor to determine possible video modes. Ex: full-screen, windowed, etc.
+		GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		
+		glfwSetKeyCallback(window, keyCallback);
+		
+		// Set where the window appears and readies window to receive OpenGL calls
+		glfwSetWindowPos(window, 500, 200);
+		glfwMakeContextCurrent(window);
+		glfwShowWindow(window);
+		
+		/*   *** OPENGL INITIALIZATION ***   */
+		GL.createCapabilities();
+		
+		// RGB and Alpha values to be displayed when color buffer is cleared, currently set to red
+		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glEnable(GL_DEPTH_TEST);
+		System.out.println("[INFO] OpenGL Version/Graphics Driver: " + glGetString(GL_VERSION) + "\n[INFO] OpenGL has been initialized.");
+		
+		/*   *** Player Initialization ***   */
+		// Code from 85-102 will be moved to a createGame() method when it is made
+		Player[] players = GameManager.initPlayers(playerCount, playerName);
+		System.out.println("[INFO] Players initialized successfully. Game has " + playerCount + " players.\n");
+		
+		/*   *** CARD STACKS INITIALIZATION ***   */
+		Card[] newDeck = CardOps.makeNewDeck();
+		
+		Stack<Card> mainDeck = CardOps.shuffle(newDeck, newDeck.length, playerCount);
+		System.out.println("[INFO] Main card stack has been initialized and shuffled. Stack size = " + mainDeck.size() + "\n");
+		
+		if (debug == true)
+		{
+			System.out.println("*** Post-Shuffle ***");
+			
+			for (int i = 0; i < 108; i++)
+				System.out.println("Card color: " + newDeck[i].color + "  Card value: " + newDeck[i].value);
 		}
+		
+		GameManager.startGame(mainDeck, players, playerCount);
+		System.out.println("Main deck size following shuffle and card to match down = " + mainDeck.size());
 	}
 
-	private void update()
+	public void update()
 	{
-		switch(gameState)
-		{
-			case MAIN_MENU:
-				
-				if (loadOptions)
-					GameGraphics.loadOptionsMenu();
-				
-				if (startNewGame)
-				{
-					if (loadNewGameOptions)
-						GameGraphics.newGameOptions();
-					
-					if (validNewGame)
-					{
-						playerCount = 1 + GameGraphics.botCount.getValue();
-						GameManager.startGame(playerCount);
-					}
-				}
-				
-				break;
-				
-			case GAME:
-				
-				break;
-			
-			case PLAYER_TURN:
-				
-					break;
-				
-			case BOT_TURN:
-	
-				// This is confusing... players[nextPlayer] = currentPlayer? Terrible variable name that need to be re-named.
-				Player currentPlayer = GameManager.players[nextPlayer];
-				
-				System.out.println("Number of cards remaining: " + GameManager.mainDeck.size());
-				System.out.println("Player 0: " + GameManager.players[0].hand.size() + "\n" + "Player 1: " + GameManager.players[1].hand.size() + "\n" + "Player 2: " + GameManager.players[2].hand.size() + "\n");
-				
-				nextPlayer = BotOps.playMove(GameManager.players, GameManager.currentPlayer, GameManager.discardDeck, GameManager.mainDeck);
-				
-				if (nextPlayer == 3)
-				{
-					System.out.println("Reseting players");
-					nextPlayer = 0;
-				}
-				
-				if (currentPlayer.hand.size() == 1)
-				{
-					currentPlayer.hasUno = true;
-					System.out.println(currentPlayer.name + " has Uno!");
-				}
-				
-				if (currentPlayer.hand.size() == 0)
-				{
-					System.out.println(currentPlayer.name + " has won!");
-					gameState = state.MAIN_MENU;
-				}
-				
-				System.out.println("");
-				GameManager.currentPlayer = nextPlayer;
-				break;
-		}
+		// Process any pending events such as user input
+		glfwPollEvents();
 	}
 	
-	private void render()
+	public void render()
 	{
-		switch(gameState)
-		{				
-			case MAIN_MENU:
-				
-				GameGraphics.menuPulse();
-				
-				break;
-			
-			case GAME:
-				
-				if (startNewGame)
-					GameGraphics.missingGraphics();
-				
-				startNewGame = false;
-				
-				if (!GameGraphics.disableMusic.isSelected())
-					audioPlay();
-				
-		    	break;
-			
-			case BOT_TURN:
-				break;
-				
-			case PLAYER_TURN:
-				break;
-		}
-	}
-	
-	private void audioPrep() throws UnsupportedAudioFileException, IOException, LineUnavailableException
-	{
-		AudioInputStream is = AudioSystem.getAudioInputStream(url);
-		clip = AudioSystem.getClip();
-		clip.open(is);
+		// Swap front and back window buffers 
+		glfwSwapBuffers(window);
 		
-		/*
-		while(true)
-		{
-			clip.start();
-			clip.stop();
-			clip.setFramePosition(0);
-		}
-		*/
-	}
-	
-	private void audioPlay()
-	{
-		clip.start();
+		// Clear color buffers on render call
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	private void run() 
+	public void run() 
 	{		
 		// Main game loop for processing events and rendering changes
 		while(isRunning)
 		{
 			update();
 			render();
-			// Should cap the game at 60 fps
-			sync(60);
+			
+			// If a user exits the window, halt the game loop and close the program
+			if(glfwWindowShouldClose(window))
+					isRunning = false;
 		}
+	}
+	
+	public void GLFWKeyCallback(long window, int key, int scancode, int action, int mods) 
+	{
+		// Some experimentation with input handling, no functionality yet
 	}
 
 }
