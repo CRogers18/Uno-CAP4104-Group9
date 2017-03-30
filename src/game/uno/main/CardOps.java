@@ -5,25 +5,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CardOps {
 
+	private static enum SpecialValue {SKIP, REVERSE, DRAW_TWO, WILD_CARD, WILD_CARD_DRAW_FOUR};
 	static int cardValue = 0, specialValue = 0;
-	
-	public CardOps()
-	{
-		// No-argument constructor
-	}
 	
 	// Makes a new deck of cards in sorted order and returns the newly created deck
 	public static Card[] makeNewDeck()
 	{
-		// Make 108 a global variable
+		// Make 108 a global variable?
 		Card[] newDeck = new Card[108];
 		
+		// This for loop could probably be made shorter
 		for (int i = 0; i < 108; i++)
 		{			
 			// Makes all of the red cards first, 0->25
 			if (i < 25)
 			{
-				if ((i > 9 && i < 13) || (i > 21 && i < 25))	// i < 25 is a redundant check
+				if ((i > 9 && i < 13) || (i > 21 && i < 25))
 				{
 					newDeck[i] = new Card('r', -1, true, specialValue);
 					specialValue++;
@@ -144,16 +141,16 @@ public class CardOps {
 		return newDeck;
 	}
 	
-	// General shuffle method
-	public static Stack<Card> shuffle(Card[] deck, int deckSize, int playerCount)
+	// General shuffle method, takes an array of cards, the size of the array, and # of players
+	public static Stack<Card> shuffle(Card[] deck, int deckLength ,int playerCount)
 	{
-		// Create
+		// Create stack of cards
 		Stack<Card> mainDeck = new Stack<Card>();
 		
-		// "Durstenfeld shuffling algorithm"
-		for (int i = 0; i < deckSize; i++)
+		// Durstenfeld shuffling algorithm provides O(n) random shuffle
+		for (int i = 0; i < deckLength; i++)
 		{
-			int j = ThreadLocalRandom.current().nextInt(i,deckSize);
+			int j = ThreadLocalRandom.current().nextInt(i,deckLength);
 			Card temp = deck[j];
 			deck[j] = deck[i];
 			deck[i] = temp;
@@ -161,11 +158,13 @@ public class CardOps {
 		
 		/* In the specific case of the first card being a wild-card, swap it out with another card before pushing to
 		   the stack. This code will only execute during the first shuffle where this problem can occur. */
-		if (deckSize == 108)
+		
+		// Needs to be re-checked, instance of the first card being a wild-card has occurred, something is wrong here
+		if (deckLength == 108)
 		{
 			while (playerCount == 2 && deck[14].color == 'x')
 			{
-				int j = ThreadLocalRandom.current().nextInt(14, deckSize);
+				int j = ThreadLocalRandom.current().nextInt(14, deckLength);
 				Card temp = deck[j];
 				deck[j] = deck[14];
 				deck[14] = temp;
@@ -173,7 +172,7 @@ public class CardOps {
 			
 			while (playerCount == 3 && deck[21].color == 'x')
 			{
-				int j = ThreadLocalRandom.current().nextInt(21, deckSize);
+				int j = ThreadLocalRandom.current().nextInt(21, deckLength);
 				Card temp = deck[j];
 				deck[j] = deck[21];
 				deck[21] = temp;
@@ -181,7 +180,7 @@ public class CardOps {
 
 			while (playerCount == 4 && deck[28].color == 'x')
 			{
-				int j = ThreadLocalRandom.current().nextInt(28, deckSize);
+				int j = ThreadLocalRandom.current().nextInt(28, deckLength);
 				Card temp = deck[j];
 				deck[j] = deck[28];
 				deck[28] = temp;
@@ -189,7 +188,7 @@ public class CardOps {
 			
 			while (playerCount == 5 && deck[35].color == 'x')
 			{
-				int j = ThreadLocalRandom.current().nextInt(35, deckSize);
+				int j = ThreadLocalRandom.current().nextInt(35, deckLength);
 				Card temp = deck[j];
 				deck[j] = deck[35];
 				deck[35] = temp;
@@ -197,7 +196,7 @@ public class CardOps {
 		}
 		
 		// Once everything is good, push to the stack and return the shuffled stack of cards
-		for (int i = 0; i < deckSize; i++)
+		for (int i = 0; i < deckLength; i++)
 			mainDeck.push(deck[i]);
 		
 		return mainDeck;

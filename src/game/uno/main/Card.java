@@ -1,19 +1,21 @@
 package game.uno.main;
 
-import game.uno.main.Enums.*;
-
 public class Card {
 	
-	public CardColor color;
-	public CardValue value;
-	public int score;
+	public char color;
+	public int value;
+	public boolean special;
+	public int specialValue;
 	
-	public Card(CardColor color, CardValue value, int score)
+	public Card(char c, int v, boolean spec, int specV)
 	{
 		// Initialization of card parameters
-		this.color = color;
-		this.value = value;
-		this.score = score;				
+		color = c;
+		value = v;
+		special = spec;
+		specialValue = specV;
+		
+		if (Main.debug == true)
+			System.out.println("Card made with color: " + c + ", Value: " + v + ", Special: " + spec + ", Special Value: " + specV);
 	}
-	
 }

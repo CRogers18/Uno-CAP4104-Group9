@@ -2,6 +2,5 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/Tien Le/OneDrive/UCF/Spring 2017/CAP 4104 - HUMAN &amp; TECHNOLOGY INTERACTION/Assignment/Assignment 3/uno/lwjgl-release-3.1.1-custom/lwjgl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
