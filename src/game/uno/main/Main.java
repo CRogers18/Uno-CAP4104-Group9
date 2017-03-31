@@ -8,28 +8,35 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JOptionPane;
+
+import game.uno.main.Main.state;
 
 public class Main {
 	
 	/* NOTE: Code has been compiled and run with JRE 1.8.0_121 it has not been tested for compatibility with alternate versions */
 	
 	public static boolean debug = false; // Set to true to print more information to console during runtime, could be moved to a constants class
-	public static boolean startNewGame = false;
-	public static boolean loadNewGameOptions = false;
-	public static boolean validNewGame = false;
-	public static boolean loadOptions = false;
+	public static boolean startNewGame = false;	// flag for checking if game UI should be drawn
+	public static boolean loadNewGameOptions = false;	// flag for checking if new game menu should load
+	public static boolean validNewGame = false;	// flag for checking if game settings are correct
+	public static boolean loadOptions = false;	// flag for checking if the options menu should be loaded
+	private static boolean audioPlaying = true;	
+	private static boolean showInfo = true;
 	private boolean isRunning = true;	// Main game loop variable
 		
 	public enum state {MAIN_MENU, GAME, PLAYER_TURN, BOT_TURN};
 	public static state gameState = state.MAIN_MENU;
 	
-	private static int playerCount;
+	public static int playerCount;
 	public static int nextPlayer = 0;
 	
 	private long variableYieldTime, lastTime;
 		
-	private Clip clip;
-	private URL url = this.getClass().getResource("nggyu.wav");
+	private Clip clip_1, clip_2;
+	private URL url_1 = this.getClass().getResource("nggyu.wav");
+	private URL url_2 = this.getClass().getResource("tpt.wav");
+
 
 	public static void main(String[] args)
 	{
@@ -38,6 +45,7 @@ public class Main {
 		game.run();
 	}
 	
+	// Method for capping game at 60 fps
     private void sync(int fps) {
     	
         if (fps <= 0) return;
@@ -79,10 +87,10 @@ public class Main {
 	
 	private void init()
 	{
-		
+		// Create main menu graphics
 		GameGraphics.createMainMenu();
 		
-		// *Palpatine voice* DO IT
+		// Prepare audio tracks for play-back
 		try {
 			audioPrep();
 		} catch (LineUnavailableException e) {
@@ -96,13 +104,24 @@ public class Main {
 
 	private void update()
 	{
-		switch(gameState)
+		switch (gameState)
 		{
 			case MAIN_MENU:
 				
+				// Run message once on game load
+				if (showInfo)
+				{
+					JOptionPane.showConfirmDialog(null, "Just a heads up... \n1) \"Back to Main Menu\" button does not work\n"
+												+ "2) Cards in player hand and playing them are broken \n3) The bots win a lot "
+												+ "because they don't play special cards correctly. It's not you, I promise <3");
+					showInfo = false;
+				}
+				
+				// If options menu is requested, load it
 				if (loadOptions)
 					GameGraphics.loadOptionsMenu();
 				
+				// If new game menu is requested, load menu and if menu is properly configured, start new game
 				if (startNewGame)
 				{
 					if (loadNewGameOptions)
@@ -115,45 +134,71 @@ public class Main {
 					}
 				}
 				
+				// If user disables background music, disable the music
+				if (!GameGraphics.disableMusic.isSelected())
+					audioPlaying = true;
+				
+				if (!GameGraphics.disableMusic.isSelected() && audioPlaying)
+					audioPlay();
+				
+				if (GameGraphics.disableMusic.isSelected() && audioPlaying)
+					audioStop();
+					
 				break;
 				
 			case GAME:
 				
-				break;
+					break;
 			
+			// Framework for player interaction with cards, this method call probably shouldn't be here
 			case PLAYER_TURN:
-				
+					GameGraphics.updateCardCount();
 					break;
 				
 			case BOT_TURN:
-	
+				
+				// This section is pretty buggy and will need to be re-worked to be more general rather than specific
+				
 				// This is confusing... players[nextPlayer] = currentPlayer? Terrible variable name that need to be re-named.
 				Player currentPlayer = GameManager.players[nextPlayer];
 				
 				System.out.println("Number of cards remaining: " + GameManager.mainDeck.size());
-				System.out.println("Player 0: " + GameManager.players[0].hand.size() + "\n" + "Player 1: " + GameManager.players[1].hand.size() + "\n" + "Player 2: " + GameManager.players[2].hand.size() + "\n");
 				
+				// Get next player after current player makes their move
 				nextPlayer = BotOps.playMove(GameManager.players, GameManager.currentPlayer, GameManager.discardDeck, GameManager.mainDeck);
 				
-				if (nextPlayer == 3)
+				// If we've reached the end of the player count, then reset back to real player and change game state to lock it
+				if (nextPlayer == playerCount)
 				{
-					System.out.println("Reseting players");
 					nextPlayer = 0;
+					gameState = state.PLAYER_TURN;
 				}
 				
+				// Check if player has Uno, if so update their player data
 				if (currentPlayer.hand.size() == 1)
 				{
 					currentPlayer.hasUno = true;
 					System.out.println(currentPlayer.name + " has Uno!");
 				}
 				
+				if (currentPlayer.hand.size() != 1 || currentPlayer.hand.size() != 0)
+					currentPlayer.hasUno = false;
+				
+				// Once someone wins, display panel with winner, need to add option to start over again
 				if (currentPlayer.hand.size() == 0)
 				{
+					GameGraphics.updateCardCount();
 					System.out.println(currentPlayer.name + " has won!");
-					gameState = state.MAIN_MENU;
+					JOptionPane.showConfirmDialog(null, currentPlayer.name + " has won!");
+					gameState = state.PLAYER_TURN;
 				}
 				
 				System.out.println("");
+				
+				// If card at top of discard is a special card, apply effects of the card
+				if (GameManager.discardDeck.peek().special)
+					GameManager.checkEffects();
+				
 				GameManager.currentPlayer = nextPlayer;
 				break;
 		}
@@ -161,27 +206,34 @@ public class Main {
 	
 	private void render()
 	{
-		switch(gameState)
+		switch (gameState)
 		{				
 			case MAIN_MENU:
 				
+				// If on the main menu, draw the pulsing background
 				GameGraphics.menuPulse();
 				
 				break;
 			
 			case GAME:
 				
+				// If a new game is being started, then generate the game UI and check audio settings
 				if (startNewGame)
-					GameGraphics.missingGraphics();
+					GameGraphics.makeGameUI();
 				
 				startNewGame = false;
 				
 				if (!GameGraphics.disableMusic.isSelected())
 					audioPlay();
 				
+				gameState = state.PLAYER_TURN;
+				
 		    	break;
 			
+		    // Basic framework for playing the game, shouldn't call updateCardCount, but it does for now
 			case BOT_TURN:
+				GameGraphics.updateDiscard();
+				GameGraphics.updateCardCount();
 				break;
 				
 			case PLAYER_TURN:
@@ -189,30 +241,40 @@ public class Main {
 		}
 	}
 	
+	// Prepares audio for play-back
 	private void audioPrep() throws UnsupportedAudioFileException, IOException, LineUnavailableException
 	{
-		AudioInputStream is = AudioSystem.getAudioInputStream(url);
-		clip = AudioSystem.getClip();
-		clip.open(is);
-		
-		/*
-		while(true)
-		{
-			clip.start();
-			clip.stop();
-			clip.setFramePosition(0);
-		}
-		*/
+		AudioInputStream is_1 = AudioSystem.getAudioInputStream(url_1);
+		AudioInputStream is_2 = AudioSystem.getAudioInputStream(url_2);
+		clip_1 = AudioSystem.getClip();
+		clip_1.open(is_1);
+		clip_2 = AudioSystem.getClip();
+		clip_2.open(is_2);
 	}
 	
+	// Plays audio clips
 	private void audioPlay()
-	{
-		clip.start();
+	{		
+		if (gameState == state.GAME)
+		{
+			clip_2.stop();
+			clip_1.start();
+		}
+		
+		if (gameState == state.MAIN_MENU && audioPlaying)
+			clip_2.start();
 	}
-
+	
+	// Stops audio clips
+	private void audioStop()
+	{
+		audioPlaying = false;
+		clip_2.stop();
+	}
+	
+	// Main game loop for processing events and rendering changes
 	private void run() 
 	{		
-		// Main game loop for processing events and rendering changes
 		while(isRunning)
 		{
 			update();

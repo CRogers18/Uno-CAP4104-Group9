@@ -12,6 +12,6 @@ public class Player {
 	public Player(String username)
 	{
 		// When a new player is created, set the passed string to the player name
-		username = name;
+		name = username;
 	}	
 }

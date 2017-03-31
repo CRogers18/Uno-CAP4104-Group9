@@ -6,7 +6,7 @@ import game.uno.main.Main.state;
 
 public class GameManager {
 	
-	private static String playerName = "Pipsqueak";
+	public static String playerName = "Pipsqueak";
 	
 	public static Card[] newDeck;
 	public static Stack<Card> mainDeck;
@@ -21,7 +21,7 @@ public class GameManager {
 		for (int i = 1; i <= playerCount; i++)
 		{
 			// enumerate these values for improved readability, 0 = player, 1 = bot1, etc.
-			switch(i)
+			switch (i)
 			{
 				case 1:
 					players[0] = new Player(playerName);
@@ -68,7 +68,6 @@ public class GameManager {
 				System.out.println("Card color: " + newDeck[i].color + "  Card value: " + newDeck[i].value);
 		}
 		
-		System.out.println("[NOTE] Since game states are being worked on a new game is automatically started.");
 		players = GameManager.initPlayers(playerCount, playerName);
 		
 		System.out.println("[INFO] Players initialized successfully. Game has " + playerCount + " players.");
@@ -103,18 +102,61 @@ public class GameManager {
 	}
 	
 	// Method to check if user has a valid move, code will likely be moved when a more appropriate place is found
-	public static void attemptMove(Card cardPlayed, Stack<Card> discardDeck)
+	public static boolean attemptMove(Card cardPlayed)
 	{	
 		char colorCheck = cardPlayed.color, discardCheck = discardDeck.peek().color;
 		int valCheck = cardPlayed.value, discardValCheck = discardDeck.peek().value;
 		
 		if (colorCheck != discardCheck || valCheck != discardValCheck || colorCheck != 'x')
-			System.out.println("Not a valid move.");
-		
+			return false;
+			
 		else
 		{
 			discardDeck.push(cardPlayed);
 			System.out.println("Valid move. Pushed card to discard stack.");
+			return true;
 		}
 	}
+	
+	public static void checkEffects()
+	{
+		int specialCardValue = discardDeck.peek().specialValue;
+		
+		switch (specialCardValue)
+		{
+			case 0:
+				System.out.println("Special card is a skip card");
+				/* Add 2 to current player, if it goes over playerCount apply skip to player0. Otherwise
+				   move to (current player + 2) */
+				break;
+			
+			case 1:
+				System.out.println("Special card is a reverse card");
+				/* Switch some boolean value in botOps and Main to have it return --currentPlayer rather than ++ */
+				break;
+				
+			case 2:
+				System.out.println("Special card is a draw two card");
+				/* Add 1 to current player, if it equals playerCount apply effect to player0. Otherwise
+				   apply to (current player + 1) */
+				break;
+				
+			case 3:
+				System.out.println("Special card is a wild card");
+				// Nothing needs to be done as wild card color picking is already handled by botOps
+				break;
+				
+			case 4:
+				System.out.println("Special card is a wild card draw four");
+				// Just need to add 1 to current player and have that player draw 4 cards, color picking is handled by botOps
+				break;
+				
+			default:
+				System.out.println("[ERROR] Special card has an improperly defined special value!");
+				// If we get here something went wrong
+				break;
+		}			
+	}
+	
+	
 }
