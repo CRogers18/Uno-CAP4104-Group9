@@ -245,7 +245,7 @@ public class GameGraphics extends JFrame {
 		BoxLayout newGameMenu = new BoxLayout(newGamePanel, BoxLayout.Y_AXIS);
 		newGamePanel.setLayout(newGameMenu);
 		
-		playerName = new JTextField("Player name", 12) {
+		playerName = new JTextField("Enter Player Name", 12) {
 			{
 				setToolTipText("Enter player name here, max of 12 characters");
 				setHorizontalAlignment(JTextField.CENTER);
@@ -262,7 +262,7 @@ public class GameGraphics extends JFrame {
 					@Override
 					public void focusLost(FocusEvent event) {
 						if (getText() == "")
-							setText("Player name");
+							setText("Enter Player Name");
 					}
 				});
 			}
@@ -402,23 +402,17 @@ public class GameGraphics extends JFrame {
 				topPanel.add(botCards[0]);
 				topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 				topPanel.add(cardsInHand[0]);
-				
-		//		botPanel.add(botCards[1]);
-		//		botPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-		//		botPanel.add(cardsInHand[1]);
 				break;
 				
 			case 3:
 				topPanel.add(botCards[0]);
 				eastPanel.add(botCards[1], BorderLayout.EAST);
-				botPanel.add(botCards[2]);
 				break;
 				
 			case 4:
 				topPanel.add(botCards[0]);
 				eastPanel.add(botCards[1], BorderLayout.EAST);
 				westPanel.add(botCards[2], BorderLayout.CENTER);
-		//		botPanel.add(botCards[3]);
 				break;
 				
 			case 5:
@@ -427,7 +421,6 @@ public class GameGraphics extends JFrame {
 				topPanel.add(botCards[1]);
 				eastPanel.add(botCards[2], BorderLayout.EAST);
 				westPanel.add(botCards[3], BorderLayout.CENTER);
-		//		botPanel.add(botCards[4]);
 				break;
 		
 		}
@@ -459,7 +452,7 @@ public class GameGraphics extends JFrame {
 		
 		// Preliminary code for handling players clicking on cards
 		for (int i = 0; i < playerCardCount; i++)
-		{
+		{			
 			cardColor = GameManager.players[0].hand.get(i).color;
 			cardValue = GameManager.players[0].hand.get(i).value;
 			special = GameManager.players[0].hand.get(i).special;
@@ -477,38 +470,8 @@ public class GameGraphics extends JFrame {
 			
 			if (special)
 			{
-				switch(specialValue)
-				{
-					// Skip
-					case 0:
-						card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-						playerCards.add(card);
-						break;
-					
-					// Reverse
-					case 1:
-						card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-						playerCards.add(card);
-						break;
-					
-					// Draw-two
-					case 2:
-						card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-						playerCards.add(card);
-						break;
-					
-					// Wild-card
-					case 3:
-						card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-						playerCards.add(card);
-						break;
-					
-					// Wild-card +4
-					case 4:
-						card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-						playerCards.add(card);
-						break;
-				}
+				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
+				playerCards.add(card);
 			}
 		}
 		
@@ -529,43 +492,10 @@ public class GameGraphics extends JFrame {
 		int specialValue = GameManager.discardDeck.peek().specialValue;
 		
 		if (!special)
-		{
-		//	System.out.println("Attempting to load " + cardColor + "_" + cardValue + ".png");
 			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_" + cardValue + ".png")));
-		}
 		
 		if (special)
-		{
-			switch(specialValue)
-			{
-				// Skip
-				case 0:
-					discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-					break;
-				
-				// Reverse
-				case 1:
-					discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-					break;
-				
-				// Draw-two
-				case 2:
-					discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-					break;
-				
-				// Wild-card
-				case 3:
-					discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-					break;
-				
-				// Wild-card +4
-				case 4:
-					discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
-					break;
-			}
-		}
-		
-		
+			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
 	}
 	
 	protected void paintComponent(Graphics g)

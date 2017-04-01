@@ -8,7 +8,7 @@ public class BotOps {
 	public static char overrideColor;
 	
 	private static char currentCardColor;
-	private static int currentCardValue;
+	private static int currentCardValue, currentSpecialValue;
 	private static Card currentCard;
 	
 	public static void evilPlot(Player[] bots, int currentBot, Stack <Card> discardDeck, Stack <Card> mainDeck)
@@ -20,30 +20,39 @@ public class BotOps {
 	{
 		// Need to not get into the habit of putting the thread to sleep to make a delay...
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
-		/* Work on handling special cards still needed, bots will still incorrectly play a 
-		   special card when the move should be invalid */
+		// Bot logic is a lot better but still prone to bugs
 		
 		for (int i = 0; i < bots[currentBot].hand.size(); i++)
 		{
 			currentCardColor = bots[currentBot].hand.get(i).color;
 			currentCardValue = bots[currentBot].hand.get(i).value;
+			currentSpecialValue = bots[currentBot].hand.get(i).specialValue;
 			currentCard = bots[currentBot].hand.get(i);
 			
+			// If current card is a wild-card, play it, as a wild-card is a valid move at any time
 			if (currentCardColor == 'x')
 			{
 				if (Main.debug)
 					System.out.println("Current color to match is " + discardDeck.peek().color);
 				
-				override = true;
 				Card tempCard = bots[currentBot].hand.get(i);
 				bots[currentBot].hand.remove(i);
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
+				
+				// Real player graphics handling
+				if (Main.nextPlayer == 0)
+				{
+					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
+					GameGraphics.playerCards.remove(i);
+					GameGraphics.playerCards.trimToSize();
+					GameGraphics.botPanel.repaint();
+				}
 				
 				if (bots[currentBot].hand.size() != 0)
 				{
@@ -53,6 +62,7 @@ public class BotOps {
 					{
 						if (bots[currentBot].hand.get(j).color != 'x')
 						{
+							override = true;
 							overrideColor = bots[currentBot].hand.get(j).color;
 							break;
 						}
@@ -60,8 +70,8 @@ public class BotOps {
 						j++;
 					}
 					
-					// This can be made random at a later time
-					if (j == bots[currentBot].hand.size())
+					// This can be made random at a later time, just defaults to red when the bot has no cards left in hand that aren't wild-cards
+					if (!override)
 						overrideColor = 'r';
 				}
 				
@@ -71,18 +81,9 @@ public class BotOps {
 				return ++currentBot;
 			}
 			
+			// If card color matches card to play color and a wild-card was not just played, play it
 			if (currentCardColor == discardDeck.peek().color && override == false)
-			{
-				if (currentCard.special)
-				{
-					Card tempCard = bots[currentBot].hand.get(i);
-					bots[currentBot].hand.remove(i);
-					bots[currentBot].hand.trimToSize();
-					discardDeck.push(tempCard);
-					
-					return ++currentBot;
-				}
-				
+			{	
 				if (Main.debug)
 					System.out.println("Current card to match is " + discardDeck.peek().color  + " " + discardDeck.peek().value);
 				
@@ -91,24 +92,23 @@ public class BotOps {
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
 				
+				// Real player graphics handling
+				if (Main.nextPlayer == 0)
+				{
+					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
+					GameGraphics.playerCards.remove(i);
+					GameGraphics.botPanel.repaint();
+				}
+				
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.value);
 				
 				return ++currentBot;
 			}
 			
-			if (currentCardValue == discardDeck.peek().value && override == false)
+			// If card values match and a wild-card was not just played and the card isn't a special card, then play it
+			if (currentCardValue == discardDeck.peek().value && override == false && !currentCard.special)
 			{
-				if (currentCard.specialValue == discardDeck.peek().specialValue)
-				{
-					Card tempCard = bots[currentBot].hand.get(i);
-					bots[currentBot].hand.remove(i);
-					bots[currentBot].hand.trimToSize();
-					discardDeck.push(tempCard);
-					
-					return ++currentBot;
-				}
-				
 				if (Main.debug)
 					System.out.println("Current card to match is " + discardDeck.peek().color + " " + discardDeck.peek().value);
 				 
@@ -117,12 +117,46 @@ public class BotOps {
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
 				
+				// Real player graphics handling
+				if (Main.nextPlayer == 0)
+				{
+					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
+					GameGraphics.playerCards.remove(i);
+					GameGraphics.botPanel.repaint();
+				}
+				
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.value);
 				
 				return ++currentBot;
 			}
 			
+			// If current card is special and special values match, play it
+			if (currentCard.special && currentSpecialValue == discardDeck.peek().specialValue)
+			{
+				if (Main.debug)
+					System.out.println("Current card to match is " + discardDeck.peek().color + " " + discardDeck.peek().specialValue);
+				 
+				Card tempCard = bots[currentBot].hand.get(i);
+				bots[currentBot].hand.remove(i);
+				bots[currentBot].hand.trimToSize();
+				discardDeck.push(tempCard);
+				
+				// Real player graphics handling
+				if (Main.nextPlayer == 0)
+				{
+					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
+					GameGraphics.playerCards.remove(i);
+					GameGraphics.botPanel.repaint();
+				}
+				
+				if (Main.debug)
+					System.out.println("Card played is " + tempCard.color + " " + tempCard.specialValue);
+				
+				return ++currentBot;
+			}
+			
+			// If wild-card was just played and the current card color matches the color that was set by the override, play it
 			if (override == true && (currentCardColor == overrideColor))
 			{
 				if (Main.debug)
@@ -133,6 +167,14 @@ public class BotOps {
 				bots[currentBot].hand.remove(i);
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
+				
+				// Real player graphics handling
+				if (Main.nextPlayer == 0)
+				{
+					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
+					GameGraphics.playerCards.remove(i);
+					GameGraphics.botPanel.repaint();
+				}
 				
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.value);

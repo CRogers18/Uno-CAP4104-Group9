@@ -112,8 +112,8 @@ public class Main {
 				if (showInfo)
 				{
 					JOptionPane.showConfirmDialog(null, "Just a heads up... \n1) \"Back to Main Menu\" button does not work\n"
-												+ "2) Cards in player hand and playing them are broken \n3) The bots win a lot "
-												+ "because they don't play special cards correctly. It's not you, I promise <3");
+												+ "2) Player interaction with hand is still a WIP \n3) Bot logic is improved"
+												+ ", however, it still occasionaly has incorrectly played cards");
 					showInfo = false;
 				}
 				
@@ -153,6 +153,7 @@ public class Main {
 			// Framework for player interaction with cards, this method call probably shouldn't be here
 			case PLAYER_TURN:
 					GameGraphics.updateCardCount();
+					gameState = state.BOT_TURN;
 					break;
 				
 			case BOT_TURN:
@@ -171,7 +172,7 @@ public class Main {
 				if (nextPlayer == playerCount)
 				{
 					nextPlayer = 0;
-					gameState = state.PLAYER_TURN;
+				//	gameState = state.PLAYER_TURN;	<--- temporarily disabled
 				}
 				
 				// Check if player has Uno, if so update their player data
@@ -190,7 +191,7 @@ public class Main {
 					GameGraphics.updateCardCount();
 					System.out.println(currentPlayer.name + " has won!");
 					JOptionPane.showConfirmDialog(null, currentPlayer.name + " has won!");
-					gameState = state.PLAYER_TURN;
+				//	gameState = state.PLAYER_TURN;	<--- temporarily disabled
 				}
 				
 				System.out.println("");
@@ -222,6 +223,7 @@ public class Main {
 					GameGraphics.makeGameUI();
 				
 				startNewGame = false;
+				GameGraphics.updateDiscard();
 				
 				if (!GameGraphics.disableMusic.isSelected())
 					audioPlay();

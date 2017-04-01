@@ -98,7 +98,7 @@ public class GameManager {
 		}
 		
 		System.out.println("\n[INFO] Main deck size following shuffle and card to match = " + mainDeck.size());
-		System.out.println("Card to match is: " + tempCard.color + " " + tempCard.value + ", Special: " + tempCard.special + " , SpecialValue: " + tempCard.specialValue + "\n");
+		System.out.println("Card to match is: " + tempCard.color + " " + tempCard.value + ", Special: " + tempCard.special + " , SpecialValue: " + tempCard.specialValue + "\n");		
 	}
 	
 	// Method to check if user has a valid move, code will likely be moved when a more appropriate place is found
