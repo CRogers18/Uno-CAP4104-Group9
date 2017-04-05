@@ -364,12 +364,12 @@ public class GameGraphics extends JFrame {
 			botCards[i].setAlignmentY(CENTER_ALIGNMENT);
 		}
 		
-		for (int i = 0; i < Main.playerCount; i++)
+		for (int i = 0; i < Main.playerCount - 1; i++)	// player 0 is human, so the first bot is player 1
 		{
 			cardsInHand[i] = new JLabel();
 			cardsInHand[i].setFont(new Font("Serif", Font.BOLD, 20));
 			cardsInHand[i].setForeground(new Color(1f, 1f, 1f));
-			cardsInHand[i].setText("Cards in hand: " + GameManager.players[i].hand.size());
+			cardsInHand[i].setText("Cards in hand: " + GameManager.players[i+1].hand.size());
 			cardsInHand[i].setAlignmentY(CENTER_ALIGNMENT);
 		}
 		
@@ -477,6 +477,12 @@ public class GameGraphics extends JFrame {
 		for (int j = 0; j < playerCardCount; j++)
 		{
 			botPanel.add(playerCards.get(j));
+		}
+		
+		// update Cards In Hand for bots	
+		for (int i = 0; i < Main.playerCount - 1; i++)	// player 0 is human, so the first bot is player 1
+		{
+			cardsInHand[i].setText("Cards in hand: " + GameManager.players[i+1].hand.size());
 		}
 		
 		frame.getContentPane().add(botPanel, "South");
