@@ -32,9 +32,9 @@ public class GameGraphics extends JFrame {
 	private static JPanel mainPanel = new JPanel();
 	private static JPanel newGamePanel = new JPanel();
 	private static JPanel gameUI = new JPanel();
-	public static JPanel botPanel;
+	public static JPanel botPanel, centerPanel;
 	public static JLabel discardPile;
-	private static JLabel mainLabel, optionsLabel1;
+	private static JLabel mainLabel, optionsLabel1, deckPile;
 	private static JButton newGame, options, quit, start, back, apply;
 	public static JCheckBox disableMusic, enableCBM;
 	public static JSlider botCount;
@@ -52,7 +52,7 @@ public class GameGraphics extends JFrame {
 		mainPanel.setLayout(mainMenu);
 		
 		frame.setResizable(false);
-		frame.setSize(1280, 720);
+		frame.setSize(1408, 792);
 		frame.setTitle("Uno: CAP 4104 Edition");
 		frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE);
 		
@@ -349,7 +349,7 @@ public class GameGraphics extends JFrame {
 		westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
 		westPanel.setBackground(new Color(0.35f, 0f, 0f));
 		
-		JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)) {
+		centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)) {
 			{
 				setBackground(new Color(0.35f, 0f, 0f));
 			}
@@ -416,13 +416,15 @@ public class GameGraphics extends JFrame {
 		direction.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/cw_direction.png")));		
 		JLabel uno = new JLabel("", JLabel.CENTER);
 		uno.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/uno.png")));
-		JLabel deckPile = new JLabel("", JLabel.CENTER);
+		deckPile = new JLabel("", JLabel.CENTER) {
+			{
+				addMouseListener(new MouseHandler());
+			}
+		};
 		deckPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/draw.png")));	
 		discardPile = new JLabel("", JLabel.CENTER);
 		
 		centerPanel.add(direction);
-		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
-		centerPanel.add(uno);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
 		centerPanel.add(deckPile);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
@@ -461,15 +463,19 @@ public class GameGraphics extends JFrame {
 			
 			if (!special)
 			{
+				String cardName = "" + i;
 				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_" + cardValue + ".png")));
 				MouseListener mouseListener = new MouseHandler();
 				card.addMouseListener(mouseListener);
+				card.setName(cardName);
 				playerCards.add(card);
 			}
 			
 			if (special)
 			{
 				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
+				MouseListener mouseListener = new MouseHandler();
+				card.addMouseListener(mouseListener);
 				playerCards.add(card);
 			}
 		}

@@ -34,8 +34,8 @@ public class Main {
 	private long variableYieldTime, lastTime;
 		
 	private Clip clip_1, clip_2;
-	private URL url_1 = this.getClass().getResource("nggyu.wav");
-	private URL url_2 = this.getClass().getResource("tpt.wav");
+	private URL url_1 = this.getClass().getResource("thunder_in_your_heart.wav");
+	private URL url_2 = this.getClass().getResource("whirlwind.wav");
 
 
 	public static void main(String[] args)
@@ -153,7 +153,7 @@ public class Main {
 			// Framework for player interaction with cards, this method call probably shouldn't be here
 			case PLAYER_TURN:
 					GameGraphics.updateCardCount();
-					gameState = state.BOT_TURN;
+				//	gameState = state.BOT_TURN;
 					break;
 				
 			case BOT_TURN:
@@ -252,6 +252,7 @@ public class Main {
 		clip_1.open(is_1);
 		clip_2 = AudioSystem.getClip();
 		clip_2.open(is_2);
+		clip_2.loop(clip_2.LOOP_CONTINUOUSLY);
 	}
 	
 	// Plays audio clips
