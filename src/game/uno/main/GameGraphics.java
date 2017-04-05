@@ -220,22 +220,6 @@ public class GameGraphics extends JFrame {
 		frame.setVisible(true);
 	}
 	
-	public static void missingGraphics()
-	{
-		frame.getContentPane().remove(newGamePanel);
-		frame.getContentPane().repaint();
-		
-		JLabel whoops = new JLabel("missingGraphics.png ¯\\_(ツ)_/¯ ") {
-			{	
-			//	setAlignmentX(Component.CENTER_ALIGNMENT);
-				setFont(new Font("Serif", Font.BOLD, 64));
-			}
-		};
-		
-		frame.add(whoops);
-		frame.setVisible(true);		
-	}
-	
 	public static void newGameOptions()
 	{
 		inSubMenu = true;
@@ -330,6 +314,13 @@ public class GameGraphics extends JFrame {
 		Main.loadNewGameOptions = false;
 	}
 	
+	public static void setBotPosition(JPanel p, JLabel playerName, JLabel botCard, JLabel cardsInHand)
+	{
+		p.add(playerName);
+		p.add(botCard);				
+		p.add(cardsInHand);
+	}
+	
 	public static void makeGameUI()
 	{
 		frame.getContentPane().remove(newGamePanel);
@@ -340,7 +331,7 @@ public class GameGraphics extends JFrame {
 				setBackground(new Color(0.35f, 0f, 0f));
 			}
 		};
-		
+	
 		botPanel = new JPanel(new FlowLayout()) {
 			{
 				setPreferredSize(new Dimension(1280, 200));
@@ -348,35 +339,22 @@ public class GameGraphics extends JFrame {
 			}
 		};
 		
-		JPanel eastPanel = new JPanel(new BorderLayout()) {
-			{
-				setPreferredSize(new Dimension(200, 290));
-				setBackground(new Color(0.35f, 0f, 0f));
-			}
-		};
+		// create eastPanel
+		JPanel eastPanel = new JPanel();
+		eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
+		eastPanel.setBackground(new Color(0.35f, 0f, 0f));
 		
-		JPanel westPanel = new JPanel(new BorderLayout()) {
-			{
-				setPreferredSize(new Dimension(200, 290));
-				setBackground(new Color(0.35f, 0f, 0f));
-			}
-		};
+		//create westPanel
+		JPanel westPanel = new JPanel();
+		westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
+		westPanel.setBackground(new Color(0.35f, 0f, 0f));
 		
 		JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)) {
 			{
 				setBackground(new Color(0.35f, 0f, 0f));
 			}
 		};
-		
-		JLabel deckPile = new JLabel("", JLabel.CENTER) {
-			{
-				setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/card_back.png")));
-			//	setHorizontalAlignment(SwingConstants.CENTER);
-			}
-		};
-		
-		discardPile = new JLabel("", JLabel.CENTER);
-		
+						
 		JLabel[] botCards = new JLabel[5];
 		
 		for (int i = 0; i < Main.playerCount; i++)
@@ -391,40 +369,61 @@ public class GameGraphics extends JFrame {
 			cardsInHand[i] = new JLabel();
 			cardsInHand[i].setFont(new Font("Serif", Font.BOLD, 20));
 			cardsInHand[i].setForeground(new Color(1f, 1f, 1f));
-			cardsInHand[i].setText("Cards in Hand: " + GameManager.players[i].hand.size());
+			cardsInHand[i].setText("Cards in hand: " + GameManager.players[i].hand.size());
 			cardsInHand[i].setAlignmentY(CENTER_ALIGNMENT);
+		}
+		
+		JLabel[] playerNames = new JLabel[5];
+		for (int i = 0; i < Main.playerCount; i++)
+		{
+			playerNames[i] = new JLabel();
+			playerNames[i].setFont(new Font("Serif", Font.BOLD, 20));
+			playerNames[i].setForeground(new Color(1f, 1f, 1f));
+			playerNames[i].setText("Name: " + GameManager.players[i].name);
+			playerNames[i].setAlignmentY(CENTER_ALIGNMENT);
 		}
 		
 		switch (Main.playerCount)
 		{
 		
-			case 2:
-				topPanel.add(botCards[0]);
-				topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-				topPanel.add(cardsInHand[0]);
+			case 2:				
+				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
 				break;
 				
 			case 3:
-				topPanel.add(botCards[0]);
-				eastPanel.add(botCards[1], BorderLayout.EAST);
+				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
+				setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
 				break;
 				
 			case 4:
-				topPanel.add(botCards[0]);
-				eastPanel.add(botCards[1], BorderLayout.EAST);
-				westPanel.add(botCards[2], BorderLayout.CENTER);
+				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
+				setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
+				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
+				setBotPosition(topPanel, playerNames[3], botCards[2], cardsInHand[2]);
 				break;
 				
 			case 5:
-				topPanel.add(botCards[0]);
-				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));
-				topPanel.add(botCards[1]);
-				eastPanel.add(botCards[2], BorderLayout.EAST);
-				westPanel.add(botCards[3], BorderLayout.CENTER);
-				break;
-		
+				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
+				setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
+				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
+				setBotPosition(topPanel, playerNames[3], botCards[2], cardsInHand[2]);	
+				setBotPosition(eastPanel, playerNames[4], botCards[3], cardsInHand[3]);
+				break;		
 		}
 		
+		// create center components (direction, uno, deckPile, and discardPile)							
+		JLabel direction = new JLabel("", JLabel.CENTER);
+		direction.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/cw_direction.png")));		
+		JLabel uno = new JLabel("", JLabel.CENTER);
+		uno.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/uno.png")));
+		JLabel deckPile = new JLabel("", JLabel.CENTER);
+		deckPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/draw.png")));	
+		discardPile = new JLabel("", JLabel.CENTER);
+		
+		centerPanel.add(direction);
+		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
+		centerPanel.add(uno);
+		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
 		centerPanel.add(deckPile);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
 		centerPanel.add(discardPile);

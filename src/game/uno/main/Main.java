@@ -172,7 +172,7 @@ public class Main {
 				if (nextPlayer == playerCount)
 				{
 					nextPlayer = 0;
-				//	gameState = state.PLAYER_TURN;	<--- temporarily disabled
+					gameState = state.PLAYER_TURN;	//<--- temporarily disabled
 				}
 				
 				// Check if player has Uno, if so update their player data
@@ -191,7 +191,7 @@ public class Main {
 					GameGraphics.updateCardCount();
 					System.out.println(currentPlayer.name + " has won!");
 					JOptionPane.showConfirmDialog(null, currentPlayer.name + " has won!");
-				//	gameState = state.PLAYER_TURN;	<--- temporarily disabled
+					gameState = state.PLAYER_TURN;	//<--- temporarily disabled
 				}
 				
 				System.out.println("");

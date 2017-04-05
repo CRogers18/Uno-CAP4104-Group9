@@ -9,6 +9,8 @@ import game.uno.main.Main.state;
 
 public class Listener implements ActionListener {
 
+	GameGraphics gg;
+	
 	public void actionPerformed(ActionEvent event) {
 		
 		if (event.getActionCommand().equals("New Game"))
