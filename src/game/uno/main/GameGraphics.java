@@ -360,7 +360,7 @@ public class GameGraphics extends JFrame {
 		for (int i = 0; i < Main.playerCount; i++)
 		{
 			botCards[i] = new JLabel();
-			botCards[i].setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/card_back.png")));
+			botCards[i].setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/card_back.png")));
 			botCards[i].setAlignmentY(CENTER_ALIGNMENT);
 		}
 		
@@ -411,20 +411,24 @@ public class GameGraphics extends JFrame {
 				break;		
 		}
 		
-		// create center components (direction, uno, deckPile, and discardPile)							
+		// create center components (skip, direction, uno, deckPile, and discardPile)							
+		JLabel skip = new JLabel("", JLabel.CENTER);
+		skip.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/skip.png")));
 		JLabel direction = new JLabel("", JLabel.CENTER);
-		direction.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/cw_direction.png")));		
+		direction.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/cw_direction.png")));		
 		JLabel uno = new JLabel("", JLabel.CENTER);
-		uno.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/uno.png")));
+		uno.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/uno.png")));
 		deckPile = new JLabel("", JLabel.CENTER) {
 			{
 				addMouseListener(new MouseHandler());
 			}
 		};
-		deckPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/draw.png")));	
+		deckPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/draw.png")));	
 		discardPile = new JLabel("", JLabel.CENTER);
 		
+		centerPanel.add(skip);
 		centerPanel.add(direction);
+		centerPanel.add(uno);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
 		centerPanel.add(deckPile);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
@@ -464,7 +468,7 @@ public class GameGraphics extends JFrame {
 			if (!special)
 			{
 				String cardName = "" + i;
-				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_" + cardValue + ".png")));
+				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_" + cardValue + ".png")));
 				MouseListener mouseListener = new MouseHandler();
 				card.addMouseListener(mouseListener);
 				card.setName(cardName);
@@ -473,7 +477,7 @@ public class GameGraphics extends JFrame {
 			
 			if (special)
 			{
-				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
+				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_1_" + specialValue + ".png")));
 				MouseListener mouseListener = new MouseHandler();
 				card.addMouseListener(mouseListener);
 				playerCards.add(card);
@@ -503,10 +507,10 @@ public class GameGraphics extends JFrame {
 		int specialValue = GameManager.discardDeck.peek().specialValue;
 		
 		if (!special)
-			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_" + cardValue + ".png")));
+			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_" + cardValue + ".png")));
 		
 		if (special)
-			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures/" + cardColor + "_1_" + specialValue + ".png")));
+			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_1_" + specialValue + ".png")));
 	}
 	
 	protected void paintComponent(Graphics g)
