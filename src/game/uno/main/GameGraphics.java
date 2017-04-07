@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseListener;
@@ -27,6 +29,8 @@ public class GameGraphics extends JFrame {
 
 	private static boolean isFade = false;
 	public static boolean inSubMenu = false;
+	private static boolean colorBlindMode = false;	// color blind mode flag
+	private static String assetFolder = "/textures/";	// asset folder: default is textures
 	
 	private static JFrame frame = new JFrame();
 	private static JPanel mainPanel = new JPanel();
@@ -38,10 +42,11 @@ public class GameGraphics extends JFrame {
 	private static JButton newGame, options, quit, start, back, apply;
 	public static JCheckBox disableMusic, enableCBM;
 	public static JSlider botCount;
-	public static JTextField playerName;
+	public static JTextField playerName;	
 		
 	public static ArrayList <JLabel> playerCards = new ArrayList<JLabel>();
 	private static JLabel[] cardsInHand = new JLabel[5];
+	private static JLabel cardsRemain;
 
 	private static float r = 0.3f, g = 0f, b = 0f;
 	private Color quitRed = new Color(125, 0, 0);
@@ -117,9 +122,18 @@ public class GameGraphics extends JFrame {
 				setMaximumSize(getSize());
 				setFont(new Font("Serif", Font.BOLD, 24));
 				setFocusPainted(false);
-				addActionListener(new Listener());
-			}
-		};
+				addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						colorBlindMode = !colorBlindMode;	
+						if(colorBlindMode)	
+							assetFolder = "/textures_blind/";
+						else
+							assetFolder = "/textures/";
+					}
+				});				
+			}};
 		
 		apply = new JButton("Apply Settings") {
 			{
@@ -154,6 +168,10 @@ public class GameGraphics extends JFrame {
 		frame.setVisible(true);
 	}
 	
+	public void addActionListener(ActionListener l) {
+		apply.addActionListener(l);
+	}
+
 	public static void menuPulse()
 	{
 		if (r < 0.75f && !isFade)
@@ -321,6 +339,21 @@ public class GameGraphics extends JFrame {
 		p.add(cardsInHand);
 	}
 	
+	// create singleBotPanel panel contains: 
+	// Bot name label, back card image label and Remaining cards label
+	public static JPanel createSingleBotpanel(JLabel playerName, JLabel botCard, JLabel cardsInHand)
+	{		
+		JPanel singleBotPanel = new JPanel();
+		singleBotPanel.setLayout(new BoxLayout(singleBotPanel, BoxLayout.Y_AXIS));
+		singleBotPanel.setBackground(new Color(0.35f, 0f, 0f));
+		
+		singleBotPanel.add(playerName);
+		singleBotPanel.add(botCard);				
+		singleBotPanel.add(cardsInHand);
+		
+		return singleBotPanel;
+	}
+	
 	public static void makeGameUI()
 	{
 		frame.getContentPane().remove(newGamePanel);
@@ -349,6 +382,11 @@ public class GameGraphics extends JFrame {
 		westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
 		westPanel.setBackground(new Color(0.35f, 0f, 0f));
 		
+		// create drawPilePanel panel contains: Draw label and Remaining cards label
+		JPanel drawPilePanel = new JPanel();
+		drawPilePanel.setLayout(new BoxLayout(drawPilePanel, BoxLayout.Y_AXIS));
+		drawPilePanel.setBackground(new Color(0.35f, 0f, 0f));
+		
 		centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)) {
 			{
 				setBackground(new Color(0.35f, 0f, 0f));
@@ -360,7 +398,7 @@ public class GameGraphics extends JFrame {
 		for (int i = 0; i < Main.playerCount; i++)
 		{
 			botCards[i] = new JLabel();
-			botCards[i].setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/card_back.png")));
+			botCards[i].setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "card_back.png")));
 			botCards[i].setAlignmentY(CENTER_ALIGNMENT);
 		}
 		
@@ -380,59 +418,71 @@ public class GameGraphics extends JFrame {
 			playerNames[i].setFont(new Font("Serif", Font.BOLD, 20));
 			playerNames[i].setForeground(new Color(1f, 1f, 1f));
 			playerNames[i].setText("Name: " + GameManager.players[i].name);
-			playerNames[i].setAlignmentY(CENTER_ALIGNMENT);
+			//playerNames[i].setAlignmentX(Component.CENTER_ALIGNMENT);
 		}
 		
 		switch (Main.playerCount)
 		{
-		
+			
 			case 2:				
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
 				break;
 				
 			case 3:
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
-				setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
+				JPanel singleBotPanel_31 = createSingleBotpanel(playerNames[2], botCards[1], cardsInHand[1]);
+				topPanel.add(singleBotPanel_31);
 				break;
 				
 			case 4:
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
-				setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
+				JPanel singleBotPanel_41 = createSingleBotpanel(playerNames[2], botCards[1], cardsInHand[1]);
+				topPanel.add(singleBotPanel_41);
 				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
-				setBotPosition(topPanel, playerNames[3], botCards[2], cardsInHand[2]);
+				JPanel singleBotPanel_42 = createSingleBotpanel(playerNames[3], botCards[2], cardsInHand[2]);
+				topPanel.add(singleBotPanel_42);
 				break;
 				
 			case 5:
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
-				setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
+				JPanel singleBotPanel_51 = createSingleBotpanel(playerNames[2], botCards[1], cardsInHand[1]);
+				topPanel.add(singleBotPanel_51);
 				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
-				setBotPosition(topPanel, playerNames[3], botCards[2], cardsInHand[2]);	
+				JPanel singleBotPanel_52 = createSingleBotpanel(playerNames[3], botCards[2], cardsInHand[2]);
+				topPanel.add(singleBotPanel_52);	
 				setBotPosition(eastPanel, playerNames[4], botCards[3], cardsInHand[3]);
 				break;		
 		}
 		
 		// create center components (skip, direction, uno, deckPile, and discardPile)							
 		JLabel skip = new JLabel("", JLabel.CENTER);
-		skip.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/skip.png")));
+		skip.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "skip.png")));
 		JLabel direction = new JLabel("", JLabel.CENTER);
-		direction.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/cw_direction.png")));		
+		direction.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "cw_direction.png")));		
 		JLabel uno = new JLabel("", JLabel.CENTER);
-		uno.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/uno.png")));
+		uno.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "uno.png")));
 		deckPile = new JLabel("", JLabel.CENTER) {
 			{
 				addMouseListener(new MouseHandler());
 			}
 		};
-		deckPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/draw.png")));	
+		deckPile.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "draw.png")));	
+		cardsRemain = new JLabel("", JLabel.CENTER);
+		//cardsRemain.setAlignmentX(Component.CENTER_ALIGNMENT);
+		cardsRemain.setFont(new Font("Serif", Font.BOLD, 20));
+		cardsRemain.setForeground(new Color(1f, 1f, 1f));		
+		drawPilePanel.add(deckPile);
+		drawPilePanel.add(cardsRemain);
+		
 		discardPile = new JLabel("", JLabel.CENTER);
 		
 		centerPanel.add(skip);
 		centerPanel.add(direction);
 		centerPanel.add(uno);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
-		centerPanel.add(deckPile);
+		centerPanel.add(drawPilePanel);
 		centerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
-		centerPanel.add(discardPile);
+		centerPanel.add(discardPile);		
 		
 		frame.getContentPane().add(centerPanel, "Center");
 		frame.getContentPane().add(topPanel, "North");
@@ -468,7 +518,7 @@ public class GameGraphics extends JFrame {
 			if (!special)
 			{
 				String cardName = "" + i;
-				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_" + cardValue + ".png")));
+				card.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_" + cardValue + ".png")));
 				MouseListener mouseListener = new MouseHandler();
 				card.addMouseListener(mouseListener);
 				card.setName(cardName);
@@ -477,7 +527,7 @@ public class GameGraphics extends JFrame {
 			
 			if (special)
 			{
-				card.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_1_" + specialValue + ".png")));
+				card.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_1_" + specialValue + ".png")));
 				MouseListener mouseListener = new MouseHandler();
 				card.addMouseListener(mouseListener);
 				playerCards.add(card);
@@ -495,6 +545,9 @@ public class GameGraphics extends JFrame {
 			cardsInHand[i].setText("Cards in hand: " + GameManager.players[i+1].hand.size());
 		}
 		
+		// refresh remaining cards display
+		cardsRemain.setText("Remaining: " + GameManager.mainDeck.size());
+		
 		frame.getContentPane().add(botPanel, "South");
 		frame.setVisible(true);
 	}
@@ -507,10 +560,10 @@ public class GameGraphics extends JFrame {
 		int specialValue = GameManager.discardDeck.peek().specialValue;
 		
 		if (!special)
-			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_" + cardValue + ".png")));
+			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_" + cardValue + ".png")));
 		
 		if (special)
-			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource("/textures_blind/" + cardColor + "_1_" + specialValue + ".png")));
+			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_1_" + specialValue + ".png")));
 	}
 	
 	protected void paintComponent(Graphics g)

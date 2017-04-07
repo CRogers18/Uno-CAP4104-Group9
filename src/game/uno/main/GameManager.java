@@ -1,5 +1,9 @@
 package game.uno.main;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
 import java.util.Stack;
 
 import game.uno.main.Main.state;
@@ -17,7 +21,11 @@ public class GameManager {
 	public static Player[] initPlayers(int playerCount, String playerName)
 	{
 		Player[] players = new Player[playerCount];
-				
+		String[] names = {"Tristana", "Shaco", "Akali", "Jinx", "Caitlyn", "Darius", "Diana", "Garen", "Jax", "Rengar"};
+		
+		// shuffle the array and then take the first names, guarantee unique names
+		Collections.shuffle(Arrays.asList(names));	
+						
 		for (int i = 1; i <= playerCount; i++)
 		{
 			// enumerate these values for improved readability, 0 = player, 1 = bot1, etc.
@@ -28,19 +36,19 @@ public class GameManager {
 					break;
 				
 				case 2:
-					players[1] = new Player("Bot 1");
+					players[1] = new Player(names[0]);
 					break;
 					
 				case 3:
-					players[2] = new Player("Bot 2");
+					players[2] = new Player(names[1]);
 					break;
 					
 				case 4:
-					players[3] = new Player("Bot 3");
+					players[3] = new Player(names[2]);
 					break;
 					
 				case 5:
-					players[4] = new Player("Bot 4");
+					players[4] = new Player(names[3]);
 					break;
 					
 				default:
