@@ -25,6 +25,39 @@ public class BotOps {
 			e.printStackTrace();
 		}
 		
+		// If a player plays a wild-card, use their choice of color as the override color for the bots
+		if (MouseHandler.choice != -1)
+		{
+			override = true;
+			
+			switch (MouseHandler.choice)
+			{
+				case 0:
+					overrideColor = 'r';
+					MouseHandler.choice = -1;
+					break;
+					
+				case 1:
+					overrideColor = 'y';
+					MouseHandler.choice = -1;
+					break;
+					
+				case 2:
+					overrideColor = 'g';
+					MouseHandler.choice = -1;
+					break;
+					
+				case 3:
+					overrideColor = 'b';
+					MouseHandler.choice = -1;
+					break;
+					
+				default:
+					System.out.println("[ERROR] Player color selection is invalid!");
+					break;
+			}
+		}
+		
 		// Bot logic is a lot better but still prone to bugs
 		
 		for (int i = 0; i < bots[currentBot].hand.size(); i++)

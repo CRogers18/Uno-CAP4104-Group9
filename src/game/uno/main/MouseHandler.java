@@ -9,12 +9,12 @@ import javax.swing.JOptionPane;
 import game.uno.main.Main.state;
 
 public class MouseHandler implements MouseListener {
-
+	
+	public static int choice = -1;
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
-		System.out.println("Mouse clicked");
-				
+						
 		if (e.getComponent() == GameGraphics.centerPanel && Main.gameState == state.PLAYER_TURN)
 		{
 			System.out.println("Draw a new card for the player...");
@@ -67,7 +67,21 @@ public class MouseHandler implements MouseListener {
 			else 
 			{
 			// Assuming no reverse-card is in play
-			GameManager.activePlayer = 1;
+			Main.nextPlayer = 1;
+			
+			if (GameManager.discardDeck.peek().special)
+				GameManager.checkEffects();
+			
+			if (GameManager.discardDeck.peek().specialValue == 3 || GameManager.discardDeck.peek().specialValue == 4)
+			{
+				Object[] colorOptions = {"Red", "Yellow", "Green", "Blue"};
+				choice = JOptionPane.showOptionDialog(GameGraphics.frame, "Please select a new color to match.", "Wild-Card Selection", JOptionPane.PLAIN_MESSAGE, JOptionPane.QUESTION_MESSAGE, null, colorOptions, null);
+				System.out.println("Player Selected" + choice);
+			}
+			
+			if (GameManager.discardDeck.peek().specialValue != 0)
+				GameManager.activePlayer = 1;
+			
 			Main.gameState= state.BOT_TURN;
 			}
 		}

@@ -34,7 +34,7 @@ public class GameGraphics extends JFrame {
 	private static boolean unHighlight = false;
 	private static String assetFolder = "/textures/";	// asset folder: default is textures
 	
-	private static JFrame frame = new JFrame();
+	public static JFrame frame = new JFrame();
 	private static JPanel mainPanel = new JPanel();
 	private static JPanel newGamePanel = new JPanel();
 	private static JPanel gameUI = new JPanel();
@@ -569,6 +569,42 @@ public class GameGraphics extends JFrame {
 		// Basically re-names the cards after one has been added or removed
 		for (int i = 0; i < playerCardCount; i++)
 			playerCards.get(i).putClientProperty("index", i);
+	}
+	
+	public static void addCardLabelToHand(Card cardToAdd)
+	{
+		char cardColor = cardToAdd.color;
+		int cardValue = cardToAdd.value, specialValue = cardToAdd.specialValue;
+		boolean special = cardToAdd.special;
+		
+		int i = playerCards.size();
+		
+		JLabel card = new JLabel();
+		
+		if (!special)
+		{
+			card.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_" + cardValue + ".png")));
+
+			MouseListener mouseListener = new MouseHandler();
+			card.addMouseListener(mouseListener);
+			card.putClientProperty("index", i);
+			playerCards.add(card);
+			playerCards.trimToSize();
+		}
+		
+		if (special)
+		{
+			card.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_1_" + specialValue + ".png")));
+			
+			MouseListener mouseListener = new MouseHandler();
+			card.addMouseListener(mouseListener);
+			card.putClientProperty("index", i);
+			playerCards.add(card);
+			playerCards.trimToSize();
+		}
+		
+		botPanel.add(playerCards.get(i));
+		
 	}
 	
 	public static void updateDiscard()

@@ -185,12 +185,13 @@ public class Main {
 				nextPlayer = BotOps.playMove(GameManager.players, GameManager.activePlayer, GameManager.discardDeck, GameManager.mainDeck);
 				GameGraphics.updateDiscard();
 				
-				// If card at top of discard is a special card, apply effects of the card
-		//		if (GameManager.discardDeck.peek().special)
-		//			GameManager.checkEffects();
-				
+				// Un-highlight bot who just played 
 				GameGraphics.highlightCurrentBot(GameManager.activePlayer);
 				
+				// If card at top of discard is a special card, apply effects of the card
+				if (GameManager.discardDeck.peek().special)
+					GameManager.checkEffects();
+								
 				// If we've reached the end of the player count, then reset back to real player and change game state to lock it
 				if (nextPlayer == playerCount)
 				{
@@ -297,6 +298,7 @@ public class Main {
 		{
 			clip_2.stop();
 			clip_1.start();
+			clip_1.loop(clip_1.LOOP_CONTINUOUSLY);
 		}
 		
 		if (gameState == state.MAIN_MENU && audioPlaying)

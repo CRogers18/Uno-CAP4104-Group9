@@ -140,21 +140,22 @@ public class GameManager {
 			{
 				case 0:
 					System.out.println("Special card is a skip card");
-					
-					activePlayer += 2;
-					
-					if (activePlayer > Main.playerCount)
-						activePlayer = 1;
-					
-					if (activePlayer == Main.playerCount)
-						activePlayer = 0;
-					
-					System.out.println("Skipping player " + (activePlayer - 1) + "'s turn");
-					
-					/* Add 2 to current player, if it goes over playerCount apply skip to player0. Otherwise
-					   move to (current player + 2) */
-					break;
 				
+					// If no reverse is in effect...
+					Main.nextPlayer += 1;
+					
+					// If we go over the player count, ex: bot 4 plays a skip thus nextPlayer = 5, wrap around to 0
+					if (Main.nextPlayer >= Main.playerCount)
+						Main.nextPlayer = 1;
+					
+					if (GameManager.activePlayer == 0)
+						GameManager.activePlayer = 2;
+					
+					System.out.println("Skipping player " + (Main.nextPlayer - 1) + "'s turn");
+					
+					break;
+			
+				/*
 				case 1:
 					System.out.println("Special card is a reverse card");
 					
@@ -171,13 +172,15 @@ public class GameManager {
 						GameGraphics.reversedFlow = false;
 					}
 					
-					/* Switch some boolean value in botOps and Main to have it return --currentPlayer rather than ++ */
+					// Switch some boolean value in botOps and Main to have it return --currentPlayer rather than ++ 
 					break;
+					
+					*/
 					
 				case 2:
 					System.out.println("Special card is a draw two card");
 					
-					playerEffected = activePlayer + 1;
+					playerEffected = Main.nextPlayer;
 					
 					if (playerEffected == Main.playerCount)
 						playerEffected = 0;
@@ -188,12 +191,17 @@ public class GameManager {
 						players[playerEffected].hand.add(draw2);
 						players[playerEffected].hand.trimToSize();
 						
+						if (playerEffected != 0)
+							GameGraphics.updateCardCount();
+						
 						if (playerEffected == 0)
-							GameGraphics.updatePlayerHandLabels();
+							GameGraphics.addCardLabelToHand(draw2);
 					}
 					
-					System.out.println("Player " + playerEffected + " has drawn 2 cards");
+					if (playerEffected == 0)
+						GameGraphics.updatePlayerHandLabels();
 					
+					System.out.println("Player " + playerEffected + " has drawn 2 cards");
 					break;
 					
 				case 3:
@@ -203,8 +211,7 @@ public class GameManager {
 					
 				case 4:
 					System.out.println("Special card is a wild card draw four");
-					// Just need to add 1 to current player and have that player draw 4 cards, color picking is handled by botOps
-					playerEffected = activePlayer + 1;
+					playerEffected = Main.nextPlayer;
 					
 					if (playerEffected == Main.playerCount)
 						playerEffected = 0;
@@ -215,12 +222,17 @@ public class GameManager {
 						players[playerEffected].hand.add(draw4);
 						players[playerEffected].hand.trimToSize();
 						
+						if (playerEffected != 0)
+							GameGraphics.updateCardCount();
+						
 						if (playerEffected == 0)
-							GameGraphics.updatePlayerHandLabels();
+							GameGraphics.addCardLabelToHand(draw4);
 					}
 					
+					if (playerEffected == 0)
+						GameGraphics.updatePlayerHandLabels();
+										
 					System.out.println("Player " + playerEffected + " has drawn 4 cards");
-					
 					break;
 					
 				default:
