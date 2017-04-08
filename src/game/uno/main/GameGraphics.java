@@ -31,6 +31,7 @@ public class GameGraphics extends JFrame {
 	public static boolean inSubMenu = false;
 	public static boolean reversedFlow = false;
 	private static boolean colorBlindMode = false;	// color blind mode flag
+	private static boolean unHighlight = false;
 	private static String assetFolder = "/textures/";	// asset folder: default is textures
 	
 	private static JFrame frame = new JFrame();
@@ -48,6 +49,7 @@ public class GameGraphics extends JFrame {
 	
 	public static ArrayList <JLabel> playerCards = new ArrayList<JLabel>();
 	private static JLabel[] cardsInHand = new JLabel[5];
+	private static JLabel[] playerNames;
 	private static JLabel cardsRemain;
 
 	private static float r = 0.3f, g = 0f, b = 0f;
@@ -331,7 +333,6 @@ public class GameGraphics extends JFrame {
 	//	newGamePanel.add(back);
 		
 		frame.getContentPane().add(newGamePanel);
-		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
 		Main.loadNewGameOptions = false;
@@ -416,7 +417,7 @@ public class GameGraphics extends JFrame {
 			cardsInHand[i].setAlignmentY(CENTER_ALIGNMENT);
 		}
 		
-		JLabel[] playerNames = new JLabel[5];
+		playerNames = new JLabel[5];
 		for (int i = 0; i < Main.playerCount; i++)
 		{
 			playerNames[i] = new JLabel();
@@ -463,7 +464,7 @@ public class GameGraphics extends JFrame {
 		JLabel skip = new JLabel("", JLabel.CENTER);
 		skip.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "skip.png")));
 		direction = new JLabel("", JLabel.CENTER);
-		direction.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "ccw_direction.png")));	
+		direction.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "cw_direction.png")));	
 		JLabel uno = new JLabel("", JLabel.CENTER);
 		uno.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "uno.png")));
 		deckPile = new JLabel("", JLabel.CENTER) {
@@ -497,7 +498,6 @@ public class GameGraphics extends JFrame {
 		frame.getContentPane().add(botPanel, "South");
 		frame.getContentPane().add(westPanel, "West");
 
-		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 	
@@ -538,6 +538,7 @@ public class GameGraphics extends JFrame {
 				card.putClientProperty("index", i);
 				playerCards.add(card);
 			}
+			
 		}
 				
 		for (int j = 0; j < playerCardCount; j++)
@@ -557,7 +558,7 @@ public class GameGraphics extends JFrame {
 			cardsInHand[i].setText("Cards in hand: " + GameManager.players[i+1].hand.size());
 		}
 		
-		frame.getContentPane().add(botPanel, "South");
+//		frame.getContentPane().add(botPanel, "South");
 		frame.setVisible(true);
 	}
 	
@@ -580,9 +581,33 @@ public class GameGraphics extends JFrame {
 		if (!special)
 			discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_" + cardValue + ".png")));
 		
-		
 		if (special)
 				discardPile.setIcon(new ImageIcon(GameGraphics.class.getResource(assetFolder + "" + cardColor + "_1_" + specialValue + ".png")));
+	}
+	
+	public static void highlightCurrentBot(int botToHighlight)
+	{
+		if (unHighlight)
+		{
+			cardsInHand[botToHighlight-1].setForeground(Color.WHITE);
+		//	cardsInHand[botToHighlight-1].setFont(new Font("Serif", Font.BOLD, 20));
+			
+			playerNames[botToHighlight].setForeground(Color.WHITE);
+		//	playerNames[botToHighlight].setFont(new Font("Serif", Font.BOLD, 20));
+			
+			unHighlight = false;
+		}
+		
+		else if (!unHighlight)
+		{
+			cardsInHand[botToHighlight-1].setForeground(Color.YELLOW);
+		//	cardsInHand[botToHighlight-1].setFont(new Font("Serif", Font.BOLD, 21));
+
+			playerNames[botToHighlight].setForeground(Color.YELLOW);
+		//	playerNames[botToHighlight].setFont(new Font("Serif", Font.BOLD, 21));
+
+			unHighlight = true;
+		}
 	}
 	
 	protected void paintComponent(Graphics g)

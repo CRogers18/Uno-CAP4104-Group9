@@ -58,6 +58,9 @@ public class MouseHandler implements MouseListener {
 					JOptionPane.showConfirmDialog(null, GameManager.players[0].name + " has won the game!");
 				
 				GameManager.nextRound();
+				GameGraphics.generateNewGameHand();
+				GameGraphics.updateCardCount();
+				GameGraphics.updateDiscard();
 				Main.gameState = state.PLAYER_TURN;
 			}
 			

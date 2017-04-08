@@ -113,8 +113,7 @@ public class Main {
 				if (showInfo)
 				{
 					JOptionPane.showConfirmDialog(null, "Just a heads up... \n1) \"Back to Main Menu\" has been removed.\n"
-												+ "2) Player interaction with hand is pretty much done. \n3) New rounds currently"
-												+ " throw a NullPointerException error and fail to start. \n4) Card effects are"
+												+ "2) Player interaction with hand is pretty much done. \n3) Card effects are"
 												+ " temporarily disabled while player hand iteraction is debugged. ");
 					showInfo = false;
 				}
@@ -170,6 +169,8 @@ public class Main {
 				// Retrieve current player from the players array at the index specified by activePlayer in gameManager
 				Player currentPlayer = GameManager.players[GameManager.activePlayer];
 				
+				GameGraphics.highlightCurrentBot(GameManager.activePlayer);
+				
 				if (GameManager.activePlayer == 0)
 				{
 					gameState = state.PLAYER_TURN;
@@ -188,6 +189,8 @@ public class Main {
 		//		if (GameManager.discardDeck.peek().special)
 		//			GameManager.checkEffects();
 				
+				GameGraphics.highlightCurrentBot(GameManager.activePlayer);
+				
 				// If we've reached the end of the player count, then reset back to real player and change game state to lock it
 				if (nextPlayer == playerCount)
 				{
@@ -195,10 +198,10 @@ public class Main {
 					gameState = state.PLAYER_TURN;
 					break;
 				}
-				
+								
 				// After a move has been made, set the activePlayer to the next person to play
 				GameManager.activePlayer = nextPlayer;
-				
+								
 				// Check if player has Uno, if so update their player data
 				if (currentPlayer.hand.size() == 1)
 				{

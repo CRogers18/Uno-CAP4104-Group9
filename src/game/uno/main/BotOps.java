@@ -146,6 +146,7 @@ public class BotOps {
 		   reached which results in a drawn card and end of the bot's turn.   */
 		Card tempCard = mainDeck.pop();
 		bots[currentBot].hand.add(tempCard);
+		bots[currentBot].hand.trimToSize();
 		
 		if (Main.debug)
 			System.out.println("No match found, drawing card from main deck");
