@@ -38,19 +38,20 @@ public class GameManager {
 					break;
 				
 				case 2:
-					players[1] = new Player(names[0]);					
+					players[1] = new Player(names[0]);
 					break;
 					
 				case 3:
-					players[1] = new Player(names[1]);		
+					players[2] = new Player(names[1]);
 					break;
 					
 				case 4:
-					players[1] = new Player(names[2]);					
+			    	players[3] = new Player(names[2]);	
+
 					break;
 					
 				case 5:
-					players[1] = new Player(names[3]);
+					players[4] = new Player(names[3]);
 					break;
 					
 				default:
@@ -185,6 +186,10 @@ public class GameManager {
 					{
 						Card draw2 = mainDeck.pop();
 						players[playerEffected].hand.add(draw2);
+						players[playerEffected].hand.trimToSize();
+						
+						if (playerEffected == 0)
+							GameGraphics.updatePlayerHandLabels();
 					}
 					
 					System.out.println("Player " + playerEffected + " has drawn 2 cards");
@@ -208,6 +213,10 @@ public class GameManager {
 					{
 						Card draw4 = mainDeck.pop();
 						players[playerEffected].hand.add(draw4);
+						players[playerEffected].hand.trimToSize();
+						
+						if (playerEffected == 0)
+							GameGraphics.updatePlayerHandLabels();
 					}
 					
 					System.out.println("Player " + playerEffected + " has drawn 4 cards");
@@ -278,9 +287,67 @@ public class GameManager {
 	}
 
 	public static void nextRound() {
-		// TODO Auto-generated method stub
 		
+		Card[] newRoundDeck = new Card[108];
+		int index = 0;
+		int playerCount = Main.playerCount;
+		
+		// First collect all the cards from players hands and stick them in a new array
+		for (int i = 0; i < playerCount; i++)
+		{
+			for (int j = 0; j < players[i].hand.size(); j++)
+			{
+				Card card = players[i].hand.remove(j);
+				newRoundDeck[index] = card;
+				index++;
+			}
+			
+			players[i].hand.trimToSize();
+			System.out.println("Player " + i + " cards remaining in hand: " + players[i].hand.size());
+		}
+		
+		// Next empty both the mainDeck and discardDeck stacks of their cards
+		while (!mainDeck.empty())
+		{
+			Card card = mainDeck.pop();
+			newRoundDeck[index] = card;
+			index++;
+		}
+		
+		while (!discardDeck.empty())
+		{
+			Card card = discardDeck.pop();
+			newRoundDeck[index] = card;
+			index++;
+		}
+		
+		// Now that all of the cards have been collected, pass them to the shuffle method
+		mainDeck = CardOps.shuffle(newRoundDeck, 108, playerCount);
+		
+		// Distribute our newly shuffled deck of cards to the players
+		CardOps.distribute(players, playerCount, mainDeck);
+		
+		Card firstCard = mainDeck.pop();
+		discardDeck.push(firstCard);
+		
+		// Print new hands for verification that shuffle was successful
+		for (int i = 0; i < playerCount; i++)
+		{
+			System.out.println("\nPlayer " + i + " Cards:");
+			for(int j = 0; j < 7; j++)
+			{
+				System.out.print(players[i].hand.get(j).color + "" + players[i].hand.get(j).value);
+				// Cause it needs to look perfect ;_;
+				if (j != 6)
+					System.out.print(", ");
+				else
+					System.out.print(" ");
+			}
+			System.out.println("");
+		}
+		
+		System.out.println("\n[INFO] Main deck size following shuffle and card to match = " + mainDeck.size());
+		System.out.println("Card to match is: " + firstCard.color + " " + firstCard.value + ", Special: " + firstCard.special + " , SpecialValue: " + firstCard.specialValue + "\n");
 	}
-	
 	
 }

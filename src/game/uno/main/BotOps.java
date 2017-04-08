@@ -45,15 +45,6 @@ public class BotOps {
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
 				
-				// Real player graphics handling
-				if (Main.nextPlayer == 0)
-				{
-					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
-					GameGraphics.playerCards.remove(i);
-					GameGraphics.playerCards.trimToSize();
-					GameGraphics.botPanel.repaint();
-				}
-				
 				if (bots[currentBot].hand.size() != 0)
 				{
 					int j = 0;
@@ -91,15 +82,7 @@ public class BotOps {
 				bots[currentBot].hand.remove(i);
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
-				
-				// Real player graphics handling
-				if (Main.nextPlayer == 0)
-				{
-					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
-					GameGraphics.playerCards.remove(i);
-					GameGraphics.botPanel.repaint();
-				}
-				
+
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.value);
 				
@@ -116,15 +99,7 @@ public class BotOps {
 				bots[currentBot].hand.remove(i);
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
-				
-				// Real player graphics handling
-				if (Main.nextPlayer == 0)
-				{
-					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
-					GameGraphics.playerCards.remove(i);
-					GameGraphics.botPanel.repaint();
-				}
-				
+
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.value);
 				
@@ -141,14 +116,6 @@ public class BotOps {
 				bots[currentBot].hand.remove(i);
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
-				
-				// Real player graphics handling
-				if (Main.nextPlayer == 0)
-				{
-					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
-					GameGraphics.playerCards.remove(i);
-					GameGraphics.botPanel.repaint();
-				}
 				
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.specialValue);
@@ -167,14 +134,6 @@ public class BotOps {
 				bots[currentBot].hand.remove(i);
 				bots[currentBot].hand.trimToSize();
 				discardDeck.push(tempCard);
-				
-				// Real player graphics handling
-				if (Main.nextPlayer == 0)
-				{
-					GameGraphics.botPanel.remove(GameGraphics.playerCards.get(i));
-					GameGraphics.playerCards.remove(i);
-					GameGraphics.botPanel.repaint();
-				}
 				
 				if (Main.debug)
 					System.out.println("Card played is " + tempCard.color + " " + tempCard.value);

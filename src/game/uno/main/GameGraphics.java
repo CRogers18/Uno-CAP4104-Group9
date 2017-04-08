@@ -328,7 +328,7 @@ public class GameGraphics extends JFrame {
 		newGamePanel.add(Box.createRigidArea(new Dimension(0, 65)));
 		newGamePanel.add(start);
 		newGamePanel.add(Box.createRigidArea(new Dimension(0, 40)));
-		newGamePanel.add(back);
+	//	newGamePanel.add(back);
 		
 		frame.getContentPane().add(newGamePanel);
 		frame.setLocationRelativeTo(null);
@@ -435,16 +435,12 @@ public class GameGraphics extends JFrame {
 				
 			case 3:
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
-			//	setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
 				JPanel singleBotPanel_31 = createSingleBotpanel(playerNames[2], botCards[1], cardsInHand[1]);
 				topPanel.add(singleBotPanel_31);
 				break;
 				
 			case 4:
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
-			//	setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
-			//	topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
-			//	setBotPosition(topPanel, playerNames[3], botCards[2], cardsInHand[2]);
 				JPanel singleBotPanel_41 = createSingleBotpanel(playerNames[2], botCards[1], cardsInHand[1]);
 				topPanel.add(singleBotPanel_41);
 				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
@@ -454,10 +450,6 @@ public class GameGraphics extends JFrame {
 				
 			case 5:
 				setBotPosition(westPanel, playerNames[1], botCards[0], cardsInHand[0]);
-			//	setBotPosition(topPanel, playerNames[2], botCards[1], cardsInHand[1]);
-			//	topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
-			//	setBotPosition(topPanel, playerNames[3], botCards[2], cardsInHand[2]);
-			//	setBotPosition(eastPanel, playerNames[4], botCards[3], cardsInHand[3]);
 				JPanel singleBotPanel_51 = createSingleBotpanel(playerNames[2], botCards[1], cardsInHand[1]);
 				topPanel.add(singleBotPanel_51);
 				topPanel.add(Box.createRigidArea(new Dimension(200, 0)));	
@@ -509,18 +501,13 @@ public class GameGraphics extends JFrame {
 		frame.setVisible(true);
 	}
 	
-	public static void updateCardCount()
+	public static void generateNewGameHand()
 	{
-	//  Code for drawing the number of cards in hand, looking for a better place to put it
-	//	int cardCount = GameManager.players[GameManager.currentPlayer].hand.size();
-	//	cardsInHand[GameManager.currentPlayer].setText("Cards in Hand: " + GameManager.players[GameManager.currentPlayer].hand.size());
-		
-		int playerCardCount = GameManager.players[0].hand.size();
+		int playerCardCount = 7;
 		char cardColor;
 		int cardValue, specialValue;
 		boolean special;
 		
-		// Preliminary code for handling players clicking on cards
 		for (int i = 0; i < playerCardCount; i++)
 		{			
 			cardColor = GameManager.players[0].hand.get(i).color;
@@ -551,16 +538,18 @@ public class GameGraphics extends JFrame {
 				card.putClientProperty("index", i);
 				playerCards.add(card);
 			}
-			
-			cardsRemain.setText("Remaining: " + GameManager.mainDeck.size());
-			frame.getContentPane().add(botPanel, "South");
-			frame.setVisible(true);
 		}
-		
+				
 		for (int j = 0; j < playerCardCount; j++)
-		{
 			botPanel.add(playerCards.get(j));
-		}
+		
+		frame.getContentPane().add(botPanel, "South");
+		frame.setVisible(true);
+	}
+	
+	public static void updateCardCount()
+	{		
+		cardsRemain.setText("Remaining: " + GameManager.mainDeck.size());
 		
 		// update Cards In Hand for bots
 		for (int i = 0; i < Main.playerCount - 1; i++)	// player 0 is human, so the first bot is player 1

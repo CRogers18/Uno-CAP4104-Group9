@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import game.uno.main.Main.state;
 
@@ -45,9 +46,27 @@ public class MouseHandler implements MouseListener {
 			GameGraphics.updatePlayerHandLabels();
 			GameGraphics.updateCardCount();
 			
+			if (GameManager.players[0].hand.size() == 0)
+			{
+				System.out.println(GameManager.players[0].name + " has won!");
+				JOptionPane.showConfirmDialog(null, GameManager.players[0].name + " has won the round!");
+				
+				GameManager.calculateScore(GameManager.players[0]);
+				JOptionPane.showConfirmDialog(null, GameManager.players[0].name + " score is now " + GameManager.players[0].score);
+				
+				if (GameManager.players[0].score >= 500)
+					JOptionPane.showConfirmDialog(null, GameManager.players[0].name + " has won the game!");
+				
+				GameManager.nextRound();
+				Main.gameState = state.PLAYER_TURN;
+			}
+			
+			else 
+			{
 			// Assuming no reverse-card is in play
 			GameManager.activePlayer = 1;
-		//	Main.gameState= state.BOT_TURN;	
+			Main.gameState= state.BOT_TURN;
+			}
 		}
 	}
 

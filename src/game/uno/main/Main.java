@@ -112,9 +112,10 @@ public class Main {
 				// Run message once on game load
 				if (showInfo)
 				{
-					JOptionPane.showConfirmDialog(null, "Just a heads up... \n1) \"Back to Main Menu\" button does not work\n"
-												+ "2) Player interaction with hand getting there \n3) No, I don't know why player cards"
-												+ "are changing randomly when the bots are playing ");
+					JOptionPane.showConfirmDialog(null, "Just a heads up... \n1) \"Back to Main Menu\" has been removed.\n"
+												+ "2) Player interaction with hand is pretty much done. \n3) New rounds currently"
+												+ " throw a NullPointerException error and fail to start. \n4) Card effects are"
+												+ " temporarily disabled while player hand iteraction is debugged. ");
 					showInfo = false;
 				}
 				
@@ -152,10 +153,17 @@ public class Main {
 			
 			// Framework for player interaction with cards, this method call probably shouldn't be here
 			case PLAYER_TURN:
-		
 					GameGraphics.updateCardCount();
-				
-				break;
+					
+					Player realPlayer = GameManager.players[0];
+					
+					if (realPlayer.hand.size() == 1)
+						realPlayer.hasUno = true;
+					
+					else
+						realPlayer.hasUno = false;
+					
+					break;
 				
 			case BOT_TURN:
 					
@@ -177,8 +185,8 @@ public class Main {
 				GameGraphics.updateDiscard();
 				
 				// If card at top of discard is a special card, apply effects of the card
-				if (GameManager.discardDeck.peek().special)
-					GameManager.checkEffects();
+		//		if (GameManager.discardDeck.peek().special)
+		//			GameManager.checkEffects();
 				
 				// If we've reached the end of the player count, then reset back to real player and change game state to lock it
 				if (nextPlayer == playerCount)
@@ -248,8 +256,9 @@ public class Main {
 				
 				if (!GameGraphics.disableMusic.isSelected())
 					audioPlay();
-								
-				GameManager.checkEffects();
+				
+				GameGraphics.generateNewGameHand();
+	//			GameManager.checkEffects();
 				
 				gameState = state.PLAYER_TURN;
 				
